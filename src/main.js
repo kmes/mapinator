@@ -1,5 +1,6 @@
-import Mapinator from './Mapinator';
+import Mapinator from './class/Mapinator';
 
-if( window ) {
-    window.Mapinator = Mapinator;
-}
+import AbstractServiceContainer from './class/models/AbstractServiceContainer';
+
+window.Mapinator = Mapinator;
+window.AbstractServiceContainer = AbstractServiceContainer;

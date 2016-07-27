@@ -1,6 +1,6 @@
 import { View, $ } from 'backbone';
 
-export class AddressView extends View {
+export default class AddressView extends View {
     contructor() {
         this.events = {
             'click': 'pickerHandler',
@@ -51,10 +51,10 @@ export class AddressView extends View {
                 componentRestrictions: {country: 'IT'}
             }
         });
-        view.$el.typeahead( null, {
+        /*view.$el.typeahead( null, {
             displayKey: 'description',
             source: addressPicker.ttAdapter()
-        });
+        });*/
 
         if( options.addressText ) {
             this.$el.val( options.addressText );
@@ -91,19 +91,4 @@ export class AddressView extends View {
             });
         }
     }
-}
-
-export function addressViewFactory( serviceContainer, config ) {
-    return new AddressView({
-        el: config.addressSelector,
-        cancelAddressSelector: '.cancel-address',
-        serviceContainer: serviceContainer,
-        mapSelector: config.mapSelector,
-        AddressPicker: AddressPicker,
-        mapLocation: config.mapLocation,
-        mapOptions: config.mapOptions,
-        addressText: config.addresstext,
-
-        collection: serviceContainer.get('stores')
-    });
 }

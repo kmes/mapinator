@@ -1,8 +1,8 @@
 import { Model } from 'backbone';
 
-export class AbstractServiceContainer extends Model {
-    constructor() {
-        super({
+export default class AbstractServiceContainer extends Model {
+    constructor( { StoreCollection, StoreModel }, { url, normalizeRequestData, parseResponse } ) {
+        var classProps = {
             defaults: {
                 mapBounds: null,
                 geocoder: null,
@@ -17,16 +17,23 @@ export class AbstractServiceContainer extends Model {
                     lng: null
                 }
             }
-        });
+        };
+        super( classProps, { StoreCollection, StoreModel }, { url, normalizeRequestData, parseResponse });
     }
 
-    initialize({ StoreCollection, StoreModel }) {
+    initialize( classProps, { StoreCollection, StoreModel }, { url, normalizeRequestData, parseResponse } ) {
         this.set( 'mapBounds', new google.maps.LatLngBounds() );
         this.set( 'geocoder', new google.maps.Geocoder() );
 
-        this.set( 'stores', new StoreCollection(null, {
-            Model: StoreModel
-        }));
+        this.set( 'stores', new StoreCollection(
+            {
+                url,
+                parse: parseResponse
+            },
+            {
+                Model: StoreModel
+            }
+        ));
 
         if( typeof this.setLocation !== 'function' ) {
             this.setLocation = function() {

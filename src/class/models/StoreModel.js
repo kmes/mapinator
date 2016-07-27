@@ -1,9 +1,9 @@
 import { Model } from 'backbone';
 
-class StoreModel extends Model {
+export default class StoreModel extends Model {
 
 }
 
-export default function StoreModelClassFactory() {
+export function StoreModelClassFactory() {
     return StoreModel;
 }

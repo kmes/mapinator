@@ -50,6 +50,9 @@ var config = {
     extraClosingRow: '.extra-closing-row'
 };
 
+
 var mapinator = new Mapinator( config );
 
 console.log( mapinator );
+
+

@@ -1,109 +1,74 @@
-import { View, $ } from 'backbone';
+import { View } from 'backbone';
 
-export class AddressView extends View {
-    contructor() {
-        this.events = {
-            'click': 'pickerHandler',
-            'keyup': 'pickerHandler'
-        };
+export default class MapView extends View {
+    constructor({ serviceContainer, EasyMaps, markerIcon, infoWindow }) {
+        var classProps = {};
+
+        super( classProps, { serviceContainer, EasyMaps, markerIcon, infoWindow });
     }
 
-    pickerHandler( evt, result ) {
+    initialize({ serviceContainer, EasyMaps, markerIcon, infoWindow }) {
         var view = this;
 
-        //console.log('event', evt.keyCode);
+        var map = serviceContainer.get('map');
 
-        switch( evt.type ) {
-            case 'keyup' :
-                var keyCode = evt.keyCode || evt.which;
-                if( keyCode == 40 || keyCode == 38 ) {
-                    break;
-                }
-                setTimeout(function() {
-                    $('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
-                }, 200);
-                break;
-            case 'click' :
-                view.el.setSelectionRange(0, view.el.value.length);
-                break;
-        }
-    }
-
-    initialize( options ) {
-        var view = this;
-
-        var addressPicker = new options.AddressPicker({
-            map: {
-                id: options.mapSelector,
-                displayMarker: false,
-                zoom: options.mapOptions.zoom,
-                center: options.mapLocation ? new google.maps.LatLng( options.mapLocation.lat, options.mapLocation.lng ) : null
-            },
-            marker: {
-                draggable: false,
-                visible: false
-            },
-            zoomForLocation: 18,
-            draggable: true,
-            reverseGeocoding: true,
-            autocompleteService: {
-                //types: ['(cities)'],
-                componentRestrictions: {country: 'IT'}
+        var easyMap = new EasyMaps({
+            map: map,
+            controls: {
+                'mapTypeControl': false,
+                'navigationControl': false,
+                'scrollwheel': false,
+                'streetViewControl': false,
+                'panControl': false,
+                'zoomControl': false,
+                'scaleControl': true,
+                'overviewMapControl': false,
+                'disableDoubleClickZoom': false,
+                'draggable': true
             }
         });
-        view.$el.typeahead( null, {
-            displayKey: 'description',
-            source: addressPicker.ttAdapter()
+        serviceContainer.set('easyMap', easyMap);
+
+        map.addListener('bounds_changed', function() {
+            window.clearTimeout( view._t );
+            view._t = window.setTimeout(function() {
+                serviceContainer.set('mapBounds', map.getBounds());
+            }, 800);
         });
 
-        if( options.addressText ) {
-            this.$el.val( options.addressText );
-        }
-
-        var placeService = addressPicker.placeService;
-
-        //addressPicker.bindDefaultTypeaheadEvent( view.$el );
-        /*view.$el.bind('typeahead:selected', addressPicker.updateMap);*/
-        view.$el.bind('typeahead:selected', function(evt, place) {
-            placeService.getDetails(place, function( result ) {
-                var location = {
-                    lat: result.geometry.location.lat(),
-                    lng: result.geometry.location.lng()
-                };
-                options.serviceContainer.setLocation( location, true );
-
-                view.$el.blur();
-
-                /*view.collection.fetch({
-                 data: location
-                 });*/
-            });
+        this.listenTo(this.collection, 'sync', function( collection, resp, req ) {
+            view.refreshMap( collection, easyMap, markerIcon, infoWindow );
         });
-        //view.$el.bind('typeahead:cursorchanged', addressPicker.updateMap);
-
-        options.serviceContainer.set('addressPicker', addressPicker );
-        options.serviceContainer.set('map', addressPicker.map );
-        options.serviceContainer.set('placeService', placeService );
-
-        if( options.cancelAddressSelector ) {
-            $( options.cancelAddressSelector ).on('click', function( evt ) {
-                view.$el.val('');
-            });
-        }
     }
-}
 
-export function addressViewFactory( serviceContainer, config ) {
-    return new AddressView({
-        el: config.addressSelector,
-        cancelAddressSelector: '.cancel-address',
-        serviceContainer: serviceContainer,
-        mapSelector: config.mapSelector,
-        AddressPicker: AddressPicker,
-        mapLocation: config.mapLocation,
-        mapOptions: config.mapOptions,
-        addressText: config.addresstext,
+    refreshMap( collection, easyMap, iconPath, infoWindowCreator ) {
+        easyMap.removeAllMarker();
+        for( var n in collection.models ) {
+            var model = collection.models[ n ];
 
-        collection: serviceContainer.get('stores')
-    });
+            var markerConfig = {
+                position: {
+                    lat: model.get('lat'),
+                    lng: model.get('lng')
+                },
+                icon: {
+                    path: iconPath,
+                    w: 41,
+                    h: 47
+                }
+            };
+            if( typeof infoWindowCreator === 'function' ) {
+                var content = infoWindowCreator( model.attributes, model );
+                if( content ) {
+                    markerConfig.infoWindow = {
+                        content: content
+                    };
+                }
+            }
+            easyMap.addMarker( markerConfig );
+        }
+
+        //todo: togliere?
+        //easyMap.fitCenterZoomToMarkers();
+    }
 }

@@ -1,6 +1,6 @@
 import { Collection } from 'backbone';
 
-export class StoreCollection extends Collection {
+export default class StoreCollection extends Collection {
     constructor({ url, parseResponse }) {
         super({
             url,
@@ -22,8 +22,4 @@ export class StoreCollection extends Collection {
             }
         });
     }
-}
-
-export function StoreCollectionFactory({ url, parseResponse }) {
-    return StoreCollection;
 }
