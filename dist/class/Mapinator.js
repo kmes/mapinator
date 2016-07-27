@@ -169,6 +169,7 @@ var Mapinator = function () {
     }, {
         key: 'createMapView',
         value: function createMapView(config, serviceContainer) {
+
             return new _MapView2.default({
                 el: config.mapSelector,
                 serviceContainer: serviceContainer,

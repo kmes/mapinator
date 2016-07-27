@@ -132,6 +132,7 @@ export default class Mapinator {
         });
     }
     createMapView( config, serviceContainer ) {
+
         return new MapView({
             el: config.mapSelector,
             serviceContainer: serviceContainer,

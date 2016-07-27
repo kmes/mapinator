@@ -17,26 +17,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var MapView = function (_View) {
     _inherits(MapView, _View);
 
-    function MapView(_ref) {
-        var serviceContainer = _ref.serviceContainer;
-        var EasyMaps = _ref.EasyMaps;
-        var markerIcon = _ref.markerIcon;
-        var infoWindow = _ref.infoWindow;
-
+    function MapView(options) {
         _classCallCheck(this, MapView);
 
         var classProps = {};
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(MapView).call(this, classProps, { serviceContainer: serviceContainer, EasyMaps: EasyMaps, markerIcon: markerIcon, infoWindow: infoWindow }));
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(MapView).call(this, classProps, options));
     }
 
     _createClass(MapView, [{
         key: 'initialize',
-        value: function initialize(_ref2) {
-            var serviceContainer = _ref2.serviceContainer;
-            var EasyMaps = _ref2.EasyMaps;
-            var markerIcon = _ref2.markerIcon;
-            var infoWindow = _ref2.infoWindow;
+        value: function initialize(classProps, _ref) {
+            var serviceContainer = _ref.serviceContainer;
+            var EasyMaps = _ref.EasyMaps;
+            var markerIcon = _ref.markerIcon;
+            var infoWindow = _ref.infoWindow;
 
             var view = this;
 

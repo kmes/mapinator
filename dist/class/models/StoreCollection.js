@@ -23,7 +23,7 @@ var StoreCollection = function (_Collection) {
 
         _classCallCheck(this, StoreCollection);
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(StoreCollection).call(this, {
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(StoreCollection).call(this, {}, {
             url: url,
             parse: parseResponse
         }));

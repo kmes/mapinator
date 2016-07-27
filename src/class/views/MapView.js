@@ -1,13 +1,13 @@
 import { View } from 'backbone';
 
 export default class MapView extends View {
-    constructor({ serviceContainer, EasyMaps, markerIcon, infoWindow }) {
+    constructor( options ) {
         var classProps = {};
 
-        super( classProps, { serviceContainer, EasyMaps, markerIcon, infoWindow });
+        super( classProps, options );
     }
 
-    initialize({ serviceContainer, EasyMaps, markerIcon, infoWindow }) {
+    initialize( classProps, { serviceContainer, EasyMaps, markerIcon, infoWindow } ) {
         var view = this;
 
         var map = serviceContainer.get('map');
