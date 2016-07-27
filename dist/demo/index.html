@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="it-IT">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1, minimum-scale=1">
+    <title>Maxi Zoo - Trova punto vendita</title>
+    <meta name="description" content="">
+
+    <meta name="theme-color" content="#e7001f">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+
+    <link href="http://www.maxizoo.local/css/style.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <script src="//cdn.jsdelivr.net/css3polyfill/1.0.0/css3polyfill.min.js"></script>
+    <![endif]-->
+
+    <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
+    <script type="text/javascript">
+        window.cookieconsent_options = {"message":"Per offrire una migliore esperienza di navigazione questo sito usa cookie, anche di terze parti. Chiudendo questo banner, scorrendo questa pagina, cliccando su un link o proseguendo la navigazione in altra maniera, acconsenti all'uso dei cookie. Per maggiori informazioni, anche in ordine alla disattivazione, è possibile consultare l'informativa cookie completa.","dismiss":"Ok!","learnMore":"Maggiori Informazioni","link":"privacy","theme":"dark-bottom"};
+    </script>
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
+    <!-- End Cookie Consent plugin -->
+
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-maxizoo navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#menu-maxizoo" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://www.maxizoo.local">
+                <img class="center-block" src="http://www.maxizoo.local/img/logo.png" srcset="http://www.maxizoo.local/img/logo@2x.png 2x" />
+            </a>
+            <a class="navbar-marchio" href="http://www.maxizoo.local">
+                <img class="img-responsive" src="http://www.maxizoo.local/img/marchio.png" srcset="http://www.maxizoo.local/img/marchio@2x.png 2x" />
+            </a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="menu-maxizoo">
+            <ul class="nav navbar-nav">
+                <li><a class="" href="http://www.maxizoo.local/sfoglia-volantino">Sfoglia volantino</a></li>
+                <li><a class="active" href="http://www.maxizoo.local/trova-punto-vendita">Trova punto vendita</a></li>
+                <li><a class="" href="http://www.maxizoo.local/eventi">Eventi</a></li>
+                <li><a class="" href="http://www.maxizoo.local/marchi-esclusivi">Marchi esclusivi</a></li>
+                <li><a class="" href="http://www.maxizoo.local/azienda">Azienda</a></li>
+                <li><a class="" href="http://www.maxizoo.local/lavora-con-noi">Lavora con noi</a></li>
+                <li><a class="" href="http://www.maxizoo.local/contattaci">Contattaci</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+
+<div class="container" id="pdv-search">
+    <div class="row">
+
+        <div class="search-container">
+            <div class="geoLocation-container">
+                <a class="btn-locate btn btn-success btn-lg btn-block" href="#">
+                    <img src="http://www.maxizoo.local/img/icon-local.png" srcset="http://www.maxizoo.local/img/icon-local@2x.png 2x">
+                    <div class="loadingImage"></div>
+                </a>
+            </div>
+            <div class="addressSearch-container">
+                <input type="search" class="form-control input-lg" id="addressSearch" placeholder="Scrivi la città o il CAP">
+                <a class="cancel-address">&#10006;</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="container-fluid">
+    <!-- Mappa -->
+    <div class="row">
+        <div id="map"></div>
+    </div>
+</div>
+
+<div class="marker-prototype hidden">
+    <img src="http://www.maxizoo.local/img/map-marker@2x.png" class="marker-store">
+</div>
+
+<div class="message-prototype hidden">
+    <p class="message h4 text-center">Attualmente non sono presenti punti vendita nella zona specificata</p>
+</div>
+
+<div class="store-prototype hidden">
+
+    <div class="col-sm-6">
+        <div class="store-panel panel panel-default">
+            <a name="!store_" class="anchor">&nbsp;</a>
+            <div class="panel-body">
+                <address class="details">
+                    <h2 class="title red text-uppercase">Nome</h2>
+                    <h3 class="gray">
+                        <span class="street">Indirizzo</span>
+
+                        <span class="phone"><br /><br />Tel. </span>
+                    </h3>
+                    <p class="dettaglio indication"> a 2 minuti dall'Esselunga di Viale Sabotino </p>
+                    <div class="opening-hours">
+                        <p class="opening-title">Orari di apertura: </p>
+                        <p class="opening-row">
+                            <strong class="days"></strong>: <span class="hours"></span>
+                        </p>
+                    </div>
+                    <div class="extra-opening-hours margin-top">
+                        <p class="extra-opening-title red">Aperture straordinarie: </p>
+                        <p class="extra-opening-row">
+                            <strong class="days"></strong>: <span class="hours"></span>
+                        </p>
+                    </div>
+                    <div class="extra-closing-hours margin-top">
+                        <p class="extra-closing-title red">Chiusure straordinarie: </p>
+                        <p class="extra-closing-row">
+                            <strong class="days"></strong>: <span class="hours"></span>
+                        </p>
+                    </div>
+                </address>
+                <div class="row cta">
+                    <div class="col-xs-6">
+                        <a class="direction-cta btn btn-lg btn-success btn-block" href="//www.google.com/maps/dir/0,0/1,1/?directionsmode=transit" target="_blank">Indicazioni</a>
+                    </div>
+                    <div class="col-xs-6">
+                        <a class="phone-cta btn btn-lg btn-danger btn-block" href="tel:">Chiama</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="store-info-prototype hidden">
+
+    <div class="store-info">
+        <address class="details">
+            <a href="#!store_" class="link-hours">
+                <h2 class="title red text-uppercase">Nome</h2>
+                <h3 class="gray">
+                    <span class="street">Indirizzo</span>
+                    <br>
+                    <span class="phone">Tel. </span>
+                </h3>
+                <p class="show-hours red">
+                    Mostra orari di apertura
+                </p>
+            </a>
+        </address>
+    </div>
+
+</div>
+
+<div class="container" id="pdv-list">
+    <div class="stores-container">
+        <div class="col-sm-12">
+            <p class="message h4 text-center">Per visualizzare i punti vendita vicini a te inserisci l'indirizzo nella barra superiore</p>
+        </div>
+    </div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true&libraries=places"></script>
+
+
+<div class="loading-mask">
+    <div class="loading-container">
+        <div class="spinner"></div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row social">
+        <a href="https://www.facebook.com/maxizooitalia#" target="_blank" class="pull-left">
+            <img class="" src="http://www.maxizoo.local/img/facebook.png" srcset="http://www.maxizoo.local/img/facebook@2x.png 2x" title="Facebook" alt="Facebook">
+        </a>
+        <a href="https://instagram.com/maxizooitalia" target="_blank" class="pull-left">
+            <img class="" src="http://www.maxizoo.local/img/youtube.png" srcset="http://www.maxizoo.local/img/youtube@2x.png 2x" title="YouTube" alt="YouTube">
+        </a>
+        <a href="https://www.youtube.com/user/ItaliaMaxiZoo" target="_blank" class="pull-left">
+            <img class="" src="http://www.maxizoo.local/img/instagram.png" srcset="http://www.maxizoo.local/img/instagram@2x.png 2x" title="Instagram" alt="Instagram">
+        </a>
+        <!--
+                <a href="https://plus.google.com/+MaxizooIta" target="_blank" class="pull-left">
+                    <img class="" src="http://www.maxizoo.local/img/google-plus.png" srcset="http://www.maxizoo.local/img/google-plus@2x.png 2x" title="Google+" alt="Google+">
+                </a>
+        -->
+        <a href="https://www.linkedin.com/company/1931005" target="_blank" class="pull-left">
+            <img class="" src="http://www.maxizoo.local/img/linkedin.png" srcset="http://www.maxizoo.local/img/linkedin@2x.png 2x" title="LinkedIn" alt="LinkedIn">
+        </a>
+        <a href="https://www.maxizoo.it/blog" target="_blank" class="pull-left">
+            <img class="" src="http://www.maxizoo.local/img/blog.png" srcset="http://www.maxizoo.local/img/blog@2x.png 2x" title="Gli amici di Max" alt="Gli amici di Max">
+        </a>
+        <span class="clearfix"></span>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <p class="text-left">
+                    <strong>© 2011 Maxi Zoo Italia S.p.A.</strong><br />
+                    <br />
+                    Società con Socio unico soggetta al controllo e coordinamento di Fressnapf Beteiligungs GmbH.<br />
+                    <br />
+                    Cap.soc. € 120.000,00 i.v. - P.IVA e C.F. 03503300232 - REA 1812370 Milano<br />
+                    <br />
+                    Sede legale e amministrativa: via XXV Aprile, 5 20016 Pero - MI<br />
+                    PEC: maxizooitaliaspa@pec.it
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="jquery.min.js"></script>
+<script src="mapinator.js"></script>
+<script src="script.js"></script>
+<script type="text/javascript">jQuery.noConflict(true);</script>
+</body>
+</html>
