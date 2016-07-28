@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -59,12 +60,26 @@ var AbstractServiceContainer = function (_Model) {
             this.set('mapBounds', new google.maps.LatLngBounds());
             this.set('geocoder', new google.maps.Geocoder());
 
-            this.set('stores', new StoreCollection({
+            var stores = new StoreCollection.extend({
                 url: url,
                 parse: parseResponse
-            }, {
-                Model: StoreModel
-            }));
+            })({
+                model: StoreModel
+            });
+
+            this.set('stores', stores);
+
+            /*this.set( 'stores', new StoreCollection(
+                {
+                    model: StoreModel
+                },
+                {
+                    url,
+                    parse: parseResponse
+                }
+            ));*/
+
+            console.log('stores', this.get('stores'));
 
             if (typeof this.setLocation !== 'function') {
                 this.setLocation = function () {

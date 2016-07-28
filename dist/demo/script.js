@@ -31,7 +31,7 @@ var config = {
 
     storeMarkerIcon: '.marker-prototype .marker-store',
     getStoreIconPath: function() {
-        return $( this.storeMarkerIcon ).attr('src');
+        return jQuery( this.storeMarkerIcon ).attr('src');
     },
 
     infoWindowProto: '.store-info-prototype',

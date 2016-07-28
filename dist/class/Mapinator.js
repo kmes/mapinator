@@ -3,14 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _backbone = require('backbone');
-
-var _EasyMaps = require('./vendor/EasyMaps');
-
-var _EasyMaps2 = _interopRequireDefault(_EasyMaps);
+var _index = require('./vendor/index');
 
 var _AbstractServiceContainer = require('./models/AbstractServiceContainer');
 
@@ -42,8 +39,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-window.$ = _backbone.$;
-
 var Mapinator = function () {
     function Mapinator(config) {
         _classCallCheck(this, Mapinator);
@@ -65,7 +60,6 @@ var Mapinator = function () {
             var storesUrl = _ref.storesUrl;
 
             //var { storesUrl } = config;
-
             var ServiceContainer = _AbstractServiceContainer2.default.extend({
                 comparator: 'distance',
                 getLocation: function getLocation() {
@@ -169,16 +163,15 @@ var Mapinator = function () {
     }, {
         key: 'createMapView',
         value: function createMapView(config, serviceContainer) {
-
             return new _MapView2.default({
                 el: config.mapSelector,
                 serviceContainer: serviceContainer,
-                EasyMaps: _EasyMaps2.default,
+                EasyMaps: _index.EasyMaps,
                 markerIcon: config.getStoreIconPath(),
                 infoWindow: function infoWindow(data) {
                     if (!data) return false;
 
-                    var $info = (0, _backbone.$)(config.infoWindowProto).clone(true, true);
+                    var $info = $(config.infoWindowProto).clone(true, true);
 
                     $info.removeClass('hidden');
 
@@ -191,7 +184,7 @@ var Mapinator = function () {
                     var href = $info.find('.link-hours').attr('href');
                     $info.find('.link-hours').attr('href', href + data.id);
 
-                    return (0, _backbone.$)('<div></div>').append($info).html();
+                    return $('<div></div>').append($info).html();
                 },
                 collection: serviceContainer.get('stores')
             });

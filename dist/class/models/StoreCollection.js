@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -14,22 +15,28 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+//import backboneExtend from '../vendor/backboneExtendDecorator';
+
 var StoreCollection = function (_Collection) {
     _inherits(StoreCollection, _Collection);
 
-    function StoreCollection(_ref) {
-        var url = _ref.url;
-        var parseResponse = _ref.parseResponse;
-
+    function StoreCollection() {
         _classCallCheck(this, StoreCollection);
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(StoreCollection).call(this, {}, {
-            url: url,
-            parse: parseResponse
-        }));
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(StoreCollection).apply(this, arguments));
     }
 
     _createClass(StoreCollection, [{
+        key: 'initialize',
+
+        /*    constructor( options, classProps ) {
+        
+            }*/
+
+        value: function initialize(options, classProps) {
+            console.log('initialize', arguments);
+        }
+    }, {
         key: 'fetchStores',
         value: function fetchStores(location) {
             var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];

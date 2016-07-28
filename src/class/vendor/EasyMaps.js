@@ -5,7 +5,7 @@
  - MarkerClusterer
 
  */
-import jQuery from 'jquery';
+
 
 var $ = jQuery;
 

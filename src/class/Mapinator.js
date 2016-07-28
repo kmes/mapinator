@@ -1,8 +1,4 @@
-import { $ } from 'backbone';
-
-window.$ = $;
-
-import EasyMaps from './vendor/EasyMaps';
+import { EasyMaps, jQuery } from './vendor/index';
 
 import AbstractServiceContainer from './models/AbstractServiceContainer';
 
@@ -28,7 +24,6 @@ export default class Mapinator {
 
     createServiceContainer({ storesUrl }) {
         //var { storesUrl } = config;
-
         var ServiceContainer = AbstractServiceContainer.extend({
             comparator: 'distance',
             getLocation: function() {
@@ -132,7 +127,6 @@ export default class Mapinator {
         });
     }
     createMapView( config, serviceContainer ) {
-
         return new MapView({
             el: config.mapSelector,
             serviceContainer: serviceContainer,

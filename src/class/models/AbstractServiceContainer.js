@@ -25,15 +25,29 @@ export default class AbstractServiceContainer extends Model {
         this.set( 'mapBounds', new google.maps.LatLngBounds() );
         this.set( 'geocoder', new google.maps.Geocoder() );
 
-        this.set( 'stores', new StoreCollection(
+        var stores = StoreCollection(
             {
                 url,
                 parse: parseResponse
             },
             {
-                Model: StoreModel
+                model: StoreModel
             }
-        ));
+        );
+
+        this.set( 'stores', stores );
+
+        /*this.set( 'stores', new StoreCollection(
+            {
+                model: StoreModel
+            },
+            {
+                url,
+                parse: parseResponse
+            }
+        ));*/
+
+        console.log( 'stores', this.get('stores') );
 
         if( typeof this.setLocation !== 'function' ) {
             this.setLocation = function() {

@@ -1,14 +1,17 @@
 import { Collection } from 'backbone';
 
-export default class StoreCollection extends Collection {
-    constructor({ url, parseResponse }) {
-        super({
-            url,
-            parse: parseResponse
-        });
-    }
+import backboneExtend from '../vendor/backboneExtendDecorator';
 
-    fetchStores( location, callback = () => {} ) {
+export default @backboneExtend( Collection, {
+/*    constructor( options, classProps ) {
+
+    }*/
+
+    initialize: function( options, classProps ) {
+        console.log('initialize', arguments);
+    },
+
+    fetchStores: function( location, callback = () => {} ) {
         return this.fetch({
             data: {
                 lat: location.lat,
@@ -22,4 +25,5 @@ export default class StoreCollection extends Collection {
             }
         });
     }
-}
+
+})

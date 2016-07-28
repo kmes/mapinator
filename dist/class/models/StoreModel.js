@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.default = undefined;
 exports.StoreModelClassFactory = StoreModelClassFactory;
 
 var _backbone = require('backbone');
