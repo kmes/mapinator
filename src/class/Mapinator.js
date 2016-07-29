@@ -2,10 +2,10 @@ import { EasyMaps, jQuery } from './vendor/index';
 
 import AbstractServiceContainer from './models/AbstractServiceContainer';
 
-import StoreModel from './models/StoreModel';
-import StoreCollection from './models/StoreCollection';
-import AddressView from './views/AddressView';
-import MapView from './views/MapView';
+import StoreModelFactory from './models/StoreModelFactory';
+import StoreCollectionFactory from './models/StoreCollectionFactory';
+import AddressViewFactory from './views/AddressViewFactory';
+import MapViewFactory from './views/MapViewFactory';
 
 import * as Helper from './helper/helper';
 
@@ -17,9 +17,9 @@ export default class Mapinator {
         this.bindServiceContainer( this.serviceContainer );
 
         this.addressView = this.createAddressView( config, this.serviceContainer );
-        this.mapView = this.createMapView( config, this.serviceContainer );
+        //this.mapView = this.createMapView( config, this.serviceContainer );
 
-        this.serviceContainer.setLocation( config.mapLocation, true );
+        //this.serviceContainer.setLocation( config.mapLocation, true );
     }
 
     createServiceContainer({ storesUrl }) {
@@ -67,8 +67,8 @@ export default class Mapinator {
 
         return new ServiceContainer(
             {
-                StoreCollection,
-                StoreModel
+                StoreCollectionFactory,
+                StoreModelFactory
             },
             {
                 url: storesUrl,
@@ -113,7 +113,7 @@ export default class Mapinator {
     }
 
     createAddressView( config, serviceContainer ) {
-        return new AddressView({
+        return AddressViewFactory({}, {
             el: config.addressSelector,
             cancelAddressSelector: '.cancel-address',
             serviceContainer: serviceContainer,
@@ -127,7 +127,7 @@ export default class Mapinator {
         });
     }
     createMapView( config, serviceContainer ) {
-        return new MapView({
+        return MapViewFactory({}, {
             el: config.mapSelector,
             serviceContainer: serviceContainer,
             EasyMaps: EasyMaps,

@@ -17178,7 +17178,6 @@ return jQuery;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -17188,21 +17187,21 @@ var _AbstractServiceContainer = require('./models/AbstractServiceContainer');
 
 var _AbstractServiceContainer2 = _interopRequireDefault(_AbstractServiceContainer);
 
-var _StoreModel = require('./models/StoreModel');
+var _StoreModelFactory = require('./models/StoreModelFactory');
 
-var _StoreModel2 = _interopRequireDefault(_StoreModel);
+var _StoreModelFactory2 = _interopRequireDefault(_StoreModelFactory);
 
-var _StoreCollection = require('./models/StoreCollection');
+var _StoreCollectionFactory = require('./models/StoreCollectionFactory');
 
-var _StoreCollection2 = _interopRequireDefault(_StoreCollection);
+var _StoreCollectionFactory2 = _interopRequireDefault(_StoreCollectionFactory);
 
-var _AddressView = require('./views/AddressView');
+var _AddressViewFactory = require('./views/AddressViewFactory');
 
-var _AddressView2 = _interopRequireDefault(_AddressView);
+var _AddressViewFactory2 = _interopRequireDefault(_AddressViewFactory);
 
-var _MapView = require('./views/MapView');
+var _MapViewFactory = require('./views/MapViewFactory');
 
-var _MapView2 = _interopRequireDefault(_MapView);
+var _MapViewFactory2 = _interopRequireDefault(_MapViewFactory);
 
 var _helper = require('./helper/helper');
 
@@ -17224,9 +17223,9 @@ var Mapinator = function () {
         this.bindServiceContainer(this.serviceContainer);
 
         this.addressView = this.createAddressView(config, this.serviceContainer);
-        this.mapView = this.createMapView(config, this.serviceContainer);
+        //this.mapView = this.createMapView( config, this.serviceContainer );
 
-        this.serviceContainer.setLocation(config.mapLocation, true);
+        //this.serviceContainer.setLocation( config.mapLocation, true );
     }
 
     _createClass(Mapinator, [{
@@ -17275,8 +17274,8 @@ var Mapinator = function () {
             });
 
             return new ServiceContainer({
-                StoreCollection: _StoreCollection2.default,
-                StoreModel: _StoreModel2.default
+                StoreCollectionFactory: _StoreCollectionFactory2.default,
+                StoreModelFactory: _StoreModelFactory2.default
             }, {
                 url: storesUrl,
                 normalizeRequestData: function normalizeRequestData(requestData) {
@@ -17322,7 +17321,7 @@ var Mapinator = function () {
     }, {
         key: 'createAddressView',
         value: function createAddressView(config, serviceContainer) {
-            return new _AddressView2.default({
+            return (0, _AddressViewFactory2.default)({}, {
                 el: config.addressSelector,
                 cancelAddressSelector: '.cancel-address',
                 serviceContainer: serviceContainer,
@@ -17338,7 +17337,7 @@ var Mapinator = function () {
     }, {
         key: 'createMapView',
         value: function createMapView(config, serviceContainer) {
-            return new _MapView2.default({
+            return (0, _MapViewFactory2.default)({}, {
                 el: config.mapSelector,
                 serviceContainer: serviceContainer,
                 EasyMaps: _index.EasyMaps,
@@ -17371,7 +17370,7 @@ var Mapinator = function () {
 
 exports.default = Mapinator;
 
-},{"./helper/helper":8,"./models/AbstractServiceContainer":9,"./models/StoreCollection":10,"./models/StoreModel":11,"./vendor/index":13,"./views/AddressView":14,"./views/MapView":15}],8:[function(require,module,exports){
+},{"./helper/helper":8,"./models/AbstractServiceContainer":9,"./models/StoreCollectionFactory":10,"./models/StoreModelFactory":11,"./vendor/index":14,"./views/AddressViewFactory":15,"./views/MapViewFactory":16}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17388,7 +17387,6 @@ function sanitizePhone(phone) {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -17406,8 +17404,8 @@ var AbstractServiceContainer = function (_Model) {
     _inherits(AbstractServiceContainer, _Model);
 
     function AbstractServiceContainer(_ref, _ref2) {
-        var StoreCollection = _ref.StoreCollection;
-        var StoreModel = _ref.StoreModel;
+        var StoreCollectionFactory = _ref.StoreCollectionFactory;
+        var StoreModelFactory = _ref.StoreModelFactory;
         var url = _ref2.url;
         var normalizeRequestData = _ref2.normalizeRequestData;
         var parseResponse = _ref2.parseResponse;
@@ -17430,14 +17428,14 @@ var AbstractServiceContainer = function (_Model) {
                 }
             }
         };
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(AbstractServiceContainer).call(this, classProps, { StoreCollection: StoreCollection, StoreModel: StoreModel }, { url: url, normalizeRequestData: normalizeRequestData, parseResponse: parseResponse }));
+        return _possibleConstructorReturn(this, Object.getPrototypeOf(AbstractServiceContainer).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelFactory: StoreModelFactory }, { url: url, normalizeRequestData: normalizeRequestData, parseResponse: parseResponse }));
     }
 
     _createClass(AbstractServiceContainer, [{
         key: 'initialize',
         value: function initialize(classProps, _ref3, _ref4) {
-            var StoreCollection = _ref3.StoreCollection;
-            var StoreModel = _ref3.StoreModel;
+            var StoreCollectionFactory = _ref3.StoreCollectionFactory;
+            var StoreModelFactory = _ref3.StoreModelFactory;
             var url = _ref4.url;
             var normalizeRequestData = _ref4.normalizeRequestData;
             var parseResponse = _ref4.parseResponse;
@@ -17445,24 +17443,15 @@ var AbstractServiceContainer = function (_Model) {
             this.set('mapBounds', new google.maps.LatLngBounds());
             this.set('geocoder', new google.maps.Geocoder());
 
-            var stores = new StoreCollection.extend({
-                url: url,
+            var stores = StoreCollectionFactory({
+                //url,
+                url: 'http://www.maxizoo.local' + url,
                 parse: parseResponse
-            })({
-                model: StoreModel
+            }, null, {
+                model: StoreModelFactory
             });
 
             this.set('stores', stores);
-
-            /*this.set( 'stores', new StoreCollection(
-                {
-                    model: StoreModel
-                },
-                {
-                    url,
-                    parse: parseResponse
-                }
-            ));*/
 
             console.log('stores', this.get('stores'));
 
@@ -17537,99 +17526,64 @@ function AbstractServiceContainerClassFactory() {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.default = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _backbone = require('backbone');
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _backboneFactory = require('../vendor/backboneFactory');
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-//import backboneExtend from '../vendor/backboneExtendDecorator';
+var storeCollection = {
+    /*initialize: function( options, classProps ) {
+        console.log('initialize', arguments);
+    },*/
 
-var StoreCollection = function (_Collection) {
-    _inherits(StoreCollection, _Collection);
+    fetchStores: function fetchStores(location) {
+        var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 
-    function StoreCollection() {
-        _classCallCheck(this, StoreCollection);
-
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(StoreCollection).apply(this, arguments));
+        return this.fetch({
+            data: {
+                lat: location.lat,
+                lng: location.lng
+            },
+            success: function success(data) {
+                callback(data);
+            },
+            error: function error(_error) {
+                callback(false, _error);
+            }
+        });
     }
+};
 
-    _createClass(StoreCollection, [{
-        key: 'initialize',
+exports.default = (0, _backboneFactory2.default)(storeCollection, _backbone.Collection);
 
-        /*    constructor( options, classProps ) {
-        
-            }*/
-
-        value: function initialize(options, classProps) {
-            console.log('initialize', arguments);
-        }
-    }, {
-        key: 'fetchStores',
-        value: function fetchStores(location) {
-            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
-
-            return this.fetch({
-                data: {
-                    lat: location.lat,
-                    lng: location.lng
-                },
-                success: function success(data) {
-                    callback(data);
-                },
-                error: function error(_error) {
-                    callback(false, _error);
-                }
-            });
-        }
-    }]);
-
-    return StoreCollection;
-}(_backbone.Collection);
-
-exports.default = StoreCollection;
-
-},{"backbone":1}],11:[function(require,module,exports){
+},{"../vendor/backboneFactory":13,"backbone":1}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
-exports.default = undefined;
-exports.StoreModelClassFactory = StoreModelClassFactory;
 
 var _backbone = require('backbone');
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _backboneFactory = require('../vendor/backboneFactory');
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var StoreModel = function (_Model) {
-    _inherits(StoreModel, _Model);
+var storeModel = {
+  /*initialize: function( options, classProps ) {
+   console.log('initialize', arguments);
+   }*/
+};
 
-    function StoreModel() {
-        _classCallCheck(this, StoreModel);
+exports.default = (0, _backboneFactory2.default)(storeModel, _backbone.Model);
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(StoreModel).apply(this, arguments));
-    }
-
-    return StoreModel;
-}(_backbone.Model);
-
-exports.default = StoreModel;
-function StoreModelClassFactory() {
-    return StoreModel;
-}
-
-},{"backbone":1}],12:[function(require,module,exports){
+},{"../vendor/backboneFactory":13,"backbone":1}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18334,6 +18288,34 @@ PlacesEngine.prototype.prediction = function (text, fnCallback) {
 exports.default = EasyMaps;
 
 },{}],13:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+function backboneFactory(customObj, BackboneClass) {
+    /*console.log( 'customObj', customObj );
+     return function( classProps = {}, ...args ) {
+        var proto = Object.assign({}, customObj, classProps);
+         console.log('proto', proto);
+         var NewClass = BackboneClass.extend( proto );
+         console.log('NewClass', NewClass);
+         return new NewClass( ...args );
+    };*/
+
+    return function () {
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            args[_key - 1] = arguments[_key];
+        }
+
+        var classProps = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        return new (Function.prototype.bind.apply(BackboneClass.extend(Object.assign({}, customObj, classProps)), [null].concat(args)))();
+    };
+}
+
+exports.default = backboneFactory;
+
+},{}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18367,243 +18349,218 @@ exports.Bloodhound = Bloodhound;
 exports.EasyMaps = EasyMaps;
 exports.jQuery = jQuery;
 
-},{"./EasyMaps":12,"backbone":1,"typeahead-addresspicker/dist/typeahead-addresspicker.js":3,"typeahead.js/dist/bloodhound":4,"typeahead.js/dist/typeahead.jquery":5}],14:[function(require,module,exports){
+},{"./EasyMaps":12,"backbone":1,"typeahead-addresspicker/dist/typeahead-addresspicker.js":3,"typeahead.js/dist/bloodhound":4,"typeahead.js/dist/typeahead.jquery":5}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.default = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _backbone = require('backbone');
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _backboneFactory = require('../vendor/backboneFactory');
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var AddressView = function (_View) {
-    _inherits(AddressView, _View);
+var addressView = {
+    events: {
+        'click': 'pickerHandler',
+        'keyup': 'pickerHandler'
+    },
+    initialize: function initialize(options) {
+        var view = this;
 
-    function AddressView() {
-        _classCallCheck(this, AddressView);
-
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(AddressView).apply(this, arguments));
-    }
-
-    _createClass(AddressView, [{
-        key: 'contructor',
-        value: function contructor() {
-            this.events = {
-                'click': 'pickerHandler',
-                'keyup': 'pickerHandler'
-            };
-        }
-    }, {
-        key: 'pickerHandler',
-        value: function pickerHandler(evt, result) {
-            var view = this;
-
-            //console.log('event', evt.keyCode);
-
-            switch (evt.type) {
-                case 'keyup':
-                    var keyCode = evt.keyCode || evt.which;
-                    if (keyCode == 40 || keyCode == 38) {
-                        break;
-                    }
-                    setTimeout(function () {
-                        (0, _backbone.$)('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
-                    }, 200);
-                    break;
-                case 'click':
-                    view.el.setSelectionRange(0, view.el.value.length);
-                    break;
+        var addressPicker = new options.AddressPicker({
+            map: {
+                id: options.mapSelector,
+                displayMarker: false,
+                zoom: options.mapOptions.zoom,
+                center: options.mapLocation ? new google.maps.LatLng(options.mapLocation.lat, options.mapLocation.lng) : null
+            },
+            marker: {
+                draggable: false,
+                visible: false
+            },
+            zoomForLocation: 18,
+            draggable: true,
+            reverseGeocoding: true,
+            autocompleteService: {
+                //types: ['(cities)'],
+                componentRestrictions: { country: 'IT' }
             }
-        }
-    }, {
-        key: 'initialize',
-        value: function initialize(options) {
-            var view = this;
+        });
 
-            var addressPicker = new options.AddressPicker({
-                map: {
-                    id: options.mapSelector,
-                    displayMarker: false,
-                    zoom: options.mapOptions.zoom,
-                    center: options.mapLocation ? new google.maps.LatLng(options.mapLocation.lat, options.mapLocation.lng) : null
-                },
-                marker: {
-                    draggable: false,
-                    visible: false
-                },
-                zoomForLocation: 18,
-                draggable: true,
-                reverseGeocoding: true,
-                autocompleteService: {
-                    //types: ['(cities)'],
-                    componentRestrictions: { country: 'IT' }
-                }
-            });
-            /*view.$el.typeahead( null, {
-                displayKey: 'description',
-                source: addressPicker.ttAdapter()
-            });*/
+        console.log('addressPicker', addressPicker, addressPicker.ttAdapter());
 
-            if (options.addressText) {
-                this.$el.val(options.addressText);
-            }
+        var placeService = new google.maps.places.AutocompleteService();
 
-            var placeService = addressPicker.placeService;
+        $(view.$el).typeahead(null, {
+            displayKey: 'description',
+            //source: addressPicker.ttAdapter()
+            source: function source(query, syncSuggestions, asyncSuggestions) {
+                console.log('source', arguments);
 
-            //addressPicker.bindDefaultTypeaheadEvent( view.$el );
-            /*view.$el.bind('typeahead:selected', addressPicker.updateMap);*/
-            view.$el.bind('typeahead:selected', function (evt, place) {
-                placeService.getDetails(place, function (result) {
-                    var location = {
-                        lat: result.geometry.location.lat(),
-                        lng: result.geometry.location.lng()
-                    };
-                    options.serviceContainer.setLocation(location, true);
+                placeService.getQueryPredictions({ input: query }, function (predictions, status) {
+                    console.log('predictions', predictions);
 
-                    view.$el.blur();
-
-                    /*view.collection.fetch({
-                     data: location
-                     });*/
-                });
-            });
-            //view.$el.bind('typeahead:cursorchanged', addressPicker.updateMap);
-
-            options.serviceContainer.set('addressPicker', addressPicker);
-            options.serviceContainer.set('map', addressPicker.map);
-            options.serviceContainer.set('placeService', placeService);
-
-            if (options.cancelAddressSelector) {
-                (0, _backbone.$)(options.cancelAddressSelector).on('click', function (evt) {
-                    view.$el.val('');
+                    asyncSuggestions(predictions);
                 });
             }
+        });
+
+        if (options.addressText) {
+            this.$el.val(options.addressText);
         }
-    }]);
 
-    return AddressView;
-}(_backbone.View);
+        //var placeService = addressPicker.placeService;
 
-exports.default = AddressView;
+        console.log('placeService', placeService);
 
-},{"backbone":1}],15:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.default = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _backbone = require('backbone');
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var MapView = function (_View) {
-    _inherits(MapView, _View);
-
-    function MapView(options) {
-        _classCallCheck(this, MapView);
-
-        var classProps = {};
-
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(MapView).call(this, classProps, options));
-    }
-
-    _createClass(MapView, [{
-        key: 'initialize',
-        value: function initialize(classProps, _ref) {
-            var serviceContainer = _ref.serviceContainer;
-            var EasyMaps = _ref.EasyMaps;
-            var markerIcon = _ref.markerIcon;
-            var infoWindow = _ref.infoWindow;
-
-            var view = this;
-
-            var map = serviceContainer.get('map');
-
-            var easyMap = new EasyMaps({
-                map: map,
-                controls: {
-                    'mapTypeControl': false,
-                    'navigationControl': false,
-                    'scrollwheel': false,
-                    'streetViewControl': false,
-                    'panControl': false,
-                    'zoomControl': false,
-                    'scaleControl': true,
-                    'overviewMapControl': false,
-                    'disableDoubleClickZoom': false,
-                    'draggable': true
-                }
-            });
-            serviceContainer.set('easyMap', easyMap);
-
-            map.addListener('bounds_changed', function () {
-                window.clearTimeout(view._t);
-                view._t = window.setTimeout(function () {
-                    serviceContainer.set('mapBounds', map.getBounds());
-                }, 800);
-            });
-
-            this.listenTo(this.collection, 'sync', function (collection, resp, req) {
-                view.refreshMap(collection, easyMap, markerIcon, infoWindow);
-            });
-        }
-    }, {
-        key: 'refreshMap',
-        value: function refreshMap(collection, easyMap, iconPath, infoWindowCreator) {
-            easyMap.removeAllMarker();
-            for (var n in collection.models) {
-                var model = collection.models[n];
-
-                var markerConfig = {
-                    position: {
-                        lat: model.get('lat'),
-                        lng: model.get('lng')
-                    },
-                    icon: {
-                        path: iconPath,
-                        w: 41,
-                        h: 47
-                    }
+        //addressPicker.bindDefaultTypeaheadEvent( view.$el );
+        /*view.$el.bind('typeahead:selected', addressPicker.updateMap);*/
+        view.$el.bind('typeahead:selected', function (evt, place) {
+            placeService.getDetails(place, function (result) {
+                var location = {
+                    lat: result.geometry.location.lat(),
+                    lng: result.geometry.location.lng()
                 };
-                if (typeof infoWindowCreator === 'function') {
-                    var content = infoWindowCreator(model.attributes, model);
-                    if (content) {
-                        markerConfig.infoWindow = {
-                            content: content
-                        };
-                    }
-                }
-                easyMap.addMarker(markerConfig);
-            }
+                options.serviceContainer.setLocation(location, true);
 
-            //todo: togliere?
-            //easyMap.fitCenterZoomToMarkers();
+                view.$el.blur();
+
+                /*view.collection.fetch({
+                 data: location
+                 });*/
+            });
+        });
+        //view.$el.bind('typeahead:cursorchanged', addressPicker.updateMap);
+
+        options.serviceContainer.set('addressPicker', addressPicker);
+        options.serviceContainer.set('map', addressPicker.map);
+        options.serviceContainer.set('placeService', placeService);
+
+        if (options.cancelAddressSelector) {
+            $(options.cancelAddressSelector).on('click', function (evt) {
+                view.$el.val('');
+            });
         }
-    }]);
+    },
+    pickerHandler: function pickerHandler(evt, result) {
+        var view = this;
 
-    return MapView;
-}(_backbone.View);
+        //console.log('event', evt.keyCode);
 
-exports.default = MapView;
+        switch (evt.type) {
+            case 'keyup':
+                var keyCode = evt.keyCode || evt.which;
+                if (keyCode == 40 || keyCode == 38) {
+                    break;
+                }
+                setTimeout(function () {
+                    $('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
+                }, 200);
+                break;
+            case 'click':
+                view.el.setSelectionRange(0, view.el.value.length);
+                break;
+        }
+    }
+};
 
-},{"backbone":1}],16:[function(require,module,exports){
+exports.default = (0, _backboneFactory2.default)(addressView, _backbone.View);
+
+},{"../vendor/backboneFactory":13,"backbone":1}],16:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _backbone = require('backbone');
+
+var _backboneFactory = require('../vendor/backboneFactory');
+
+var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var mapView = {
+    initialize: function initialize(_ref) {
+        var serviceContainer = _ref.serviceContainer;
+        var EasyMaps = _ref.EasyMaps;
+        var markerIcon = _ref.markerIcon;
+        var infoWindow = _ref.infoWindow;
+
+        var view = this;
+
+        var map = serviceContainer.get('map');
+
+        var easyMap = new EasyMaps({
+            map: map,
+            controls: {
+                'mapTypeControl': false,
+                'navigationControl': false,
+                'scrollwheel': false,
+                'streetViewControl': false,
+                'panControl': false,
+                'zoomControl': false,
+                'scaleControl': true,
+                'overviewMapControl': false,
+                'disableDoubleClickZoom': false,
+                'draggable': true
+            }
+        });
+        serviceContainer.set('easyMap', easyMap);
+
+        map.addListener('bounds_changed', function () {
+            window.clearTimeout(view._t);
+            view._t = window.setTimeout(function () {
+                serviceContainer.set('mapBounds', map.getBounds());
+            }, 800);
+        });
+
+        this.listenTo(this.collection, 'sync', function (collection, resp, req) {
+            view.refreshMap(collection, easyMap, markerIcon, infoWindow);
+        });
+    },
+
+    refreshMap: function refreshMap(collection, easyMap, iconPath, infoWindowCreator) {
+        easyMap.removeAllMarker();
+        for (var n in collection.models) {
+            var model = collection.models[n];
+
+            var markerConfig = {
+                position: {
+                    lat: model.get('lat'),
+                    lng: model.get('lng')
+                },
+                icon: {
+                    path: iconPath,
+                    w: 41,
+                    h: 47
+                }
+            };
+            if (typeof infoWindowCreator === 'function') {
+                var content = infoWindowCreator(model.attributes, model);
+                if (content) {
+                    markerConfig.infoWindow = {
+                        content: content
+                    };
+                }
+            }
+            easyMap.addMarker(markerConfig);
+        }
+
+        //todo: togliere?
+        //easyMap.fitCenterZoomToMarkers();
+    }
+};
+
+exports.default = (0, _backboneFactory2.default)(mapView, _backbone.View);
+
+},{"../vendor/backboneFactory":13,"backbone":1}],17:[function(require,module,exports){
 'use strict';
 
 var _Mapinator = require('./class/Mapinator');
@@ -18617,4 +18574,4 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 window.Mapinator = _Mapinator2.default;
 //window.AbstractServiceContainer = AbstractServiceContainer;
 
-},{"./class/Mapinator":7}]},{},[16]);
+},{"./class/Mapinator":7}]},{},[17]);

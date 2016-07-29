@@ -13,9 +13,9 @@ var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var storeCollection = {
-    initialize: function initialize(options, classProps) {
+    /*initialize: function( options, classProps ) {
         console.log('initialize', arguments);
-    },
+    },*/
 
     fetchStores: function fetchStores(location) {
         var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];

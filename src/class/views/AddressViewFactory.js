@@ -1,35 +1,13 @@
-import { View, $ } from 'backbone';
+import { View } from 'backbone';
 
-export default class AddressView extends View {
-    contructor() {
-        this.events = {
-            'click': 'pickerHandler',
-            'keyup': 'pickerHandler'
-        };
-    }
+import backboneFactory from '../vendor/backboneFactory';
 
-    pickerHandler( evt, result ) {
-        var view = this;
-
-        //console.log('event', evt.keyCode);
-
-        switch( evt.type ) {
-            case 'keyup' :
-                var keyCode = evt.keyCode || evt.which;
-                if( keyCode == 40 || keyCode == 38 ) {
-                    break;
-                }
-                setTimeout(function() {
-                    $('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
-                }, 200);
-                break;
-            case 'click' :
-                view.el.setSelectionRange(0, view.el.value.length);
-                break;
-        }
-    }
-
-    initialize( options ) {
+const addressView = {
+    events: {
+        'click': 'pickerHandler',
+        'keyup': 'pickerHandler'
+    },
+    initialize: function( options ) {
         var view = this;
 
         var addressPicker = new options.AddressPicker({
@@ -51,16 +29,32 @@ export default class AddressView extends View {
                 componentRestrictions: {country: 'IT'}
             }
         });
-        /*view.$el.typeahead( null, {
-            displayKey: 'description',
-            source: addressPicker.ttAdapter()
-        });*/
+
+        console.log('addressPicker', addressPicker, addressPicker.ttAdapter());
+
+        var placeService = new google.maps.places.AutocompleteService();
+
+        $( view.$el ).typeahead( null, {
+             displayKey: 'description',
+             //source: addressPicker.ttAdapter()
+            source: function( query, syncSuggestions, asyncSuggestions ) {
+                console.log('source', arguments);
+
+                placeService.getQueryPredictions({ input: query }, function(predictions, status) {
+                    console.log('predictions', predictions);
+
+                    asyncSuggestions( predictions );
+                });
+            }
+        });
 
         if( options.addressText ) {
             this.$el.val( options.addressText );
         }
 
-        var placeService = addressPicker.placeService;
+        //var placeService = addressPicker.placeService;
+
+        console.log('placeService', placeService);
 
         //addressPicker.bindDefaultTypeaheadEvent( view.$el );
         /*view.$el.bind('typeahead:selected', addressPicker.updateMap);*/
@@ -90,5 +84,27 @@ export default class AddressView extends View {
                 view.$el.val('');
             });
         }
+    },
+    pickerHandler: function( evt, result ) {
+        var view = this;
+
+        //console.log('event', evt.keyCode);
+
+        switch( evt.type ) {
+            case 'keyup' :
+                var keyCode = evt.keyCode || evt.which;
+                if( keyCode == 40 || keyCode == 38 ) {
+                    break;
+                }
+                setTimeout(function() {
+                    $('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
+                }, 200);
+                break;
+            case 'click' :
+                view.el.setSelectionRange(0, view.el.value.length);
+                break;
+        }
     }
-}
+};
+
+export default backboneFactory( addressView, View );

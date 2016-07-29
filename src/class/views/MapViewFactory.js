@@ -1,13 +1,9 @@
 import { View } from 'backbone';
 
-export default class MapView extends View {
-    constructor( options ) {
-        var classProps = {};
+import backboneFactory from '../vendor/backboneFactory';
 
-        super( classProps, options );
-    }
-
-    initialize( classProps, { serviceContainer, EasyMaps, markerIcon, infoWindow } ) {
+const mapView = {
+    initialize: function( { serviceContainer, EasyMaps, markerIcon, infoWindow } ) {
         var view = this;
 
         var map = serviceContainer.get('map');
@@ -39,9 +35,9 @@ export default class MapView extends View {
         this.listenTo(this.collection, 'sync', function( collection, resp, req ) {
             view.refreshMap( collection, easyMap, markerIcon, infoWindow );
         });
-    }
+    },
 
-    refreshMap( collection, easyMap, iconPath, infoWindowCreator ) {
+    refreshMap: function( collection, easyMap, iconPath, infoWindowCreator ) {
         easyMap.removeAllMarker();
         for( var n in collection.models ) {
             var model = collection.models[ n ];
@@ -71,4 +67,6 @@ export default class MapView extends View {
         //todo: togliere?
         //easyMap.fitCenterZoomToMarkers();
     }
-}
+};
+
+export default backboneFactory( mapView, View );

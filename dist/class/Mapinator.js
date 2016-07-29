@@ -3,7 +3,6 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.default = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -13,21 +12,21 @@ var _AbstractServiceContainer = require('./models/AbstractServiceContainer');
 
 var _AbstractServiceContainer2 = _interopRequireDefault(_AbstractServiceContainer);
 
-var _StoreModel = require('./models/StoreModel');
+var _StoreModelFactory = require('./models/StoreModelFactory');
 
-var _StoreModel2 = _interopRequireDefault(_StoreModel);
+var _StoreModelFactory2 = _interopRequireDefault(_StoreModelFactory);
 
-var _StoreCollection = require('./models/StoreCollection');
+var _StoreCollectionFactory = require('./models/StoreCollectionFactory');
 
-var _StoreCollection2 = _interopRequireDefault(_StoreCollection);
+var _StoreCollectionFactory2 = _interopRequireDefault(_StoreCollectionFactory);
 
-var _AddressView = require('./views/AddressView');
+var _AddressViewFactory = require('./views/AddressViewFactory');
 
-var _AddressView2 = _interopRequireDefault(_AddressView);
+var _AddressViewFactory2 = _interopRequireDefault(_AddressViewFactory);
 
-var _MapView = require('./views/MapView');
+var _MapViewFactory = require('./views/MapViewFactory');
 
-var _MapView2 = _interopRequireDefault(_MapView);
+var _MapViewFactory2 = _interopRequireDefault(_MapViewFactory);
 
 var _helper = require('./helper/helper');
 
@@ -49,9 +48,9 @@ var Mapinator = function () {
         this.bindServiceContainer(this.serviceContainer);
 
         this.addressView = this.createAddressView(config, this.serviceContainer);
-        this.mapView = this.createMapView(config, this.serviceContainer);
+        //this.mapView = this.createMapView( config, this.serviceContainer );
 
-        this.serviceContainer.setLocation(config.mapLocation, true);
+        //this.serviceContainer.setLocation( config.mapLocation, true );
     }
 
     _createClass(Mapinator, [{
@@ -100,8 +99,8 @@ var Mapinator = function () {
             });
 
             return new ServiceContainer({
-                StoreCollection: _StoreCollection2.default,
-                StoreModel: _StoreModel2.default
+                StoreCollectionFactory: _StoreCollectionFactory2.default,
+                StoreModelFactory: _StoreModelFactory2.default
             }, {
                 url: storesUrl,
                 normalizeRequestData: function normalizeRequestData(requestData) {
@@ -147,7 +146,7 @@ var Mapinator = function () {
     }, {
         key: 'createAddressView',
         value: function createAddressView(config, serviceContainer) {
-            return new _AddressView2.default({
+            return (0, _AddressViewFactory2.default)({}, {
                 el: config.addressSelector,
                 cancelAddressSelector: '.cancel-address',
                 serviceContainer: serviceContainer,
@@ -163,7 +162,7 @@ var Mapinator = function () {
     }, {
         key: 'createMapView',
         value: function createMapView(config, serviceContainer) {
-            return new _MapView2.default({
+            return (0, _MapViewFactory2.default)({}, {
                 el: config.mapSelector,
                 serviceContainer: serviceContainer,
                 EasyMaps: _index.EasyMaps,

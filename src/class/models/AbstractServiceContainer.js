@@ -1,7 +1,7 @@
 import { Model } from 'backbone';
 
 export default class AbstractServiceContainer extends Model {
-    constructor( { StoreCollection, StoreModel }, { url, normalizeRequestData, parseResponse } ) {
+    constructor( { StoreCollectionFactory, StoreModelFactory }, { url, normalizeRequestData, parseResponse } ) {
         var classProps = {
             defaults: {
                 mapBounds: null,
@@ -18,34 +18,26 @@ export default class AbstractServiceContainer extends Model {
                 }
             }
         };
-        super( classProps, { StoreCollection, StoreModel }, { url, normalizeRequestData, parseResponse });
+        super( classProps, { StoreCollectionFactory, StoreModelFactory }, { url, normalizeRequestData, parseResponse });
     }
 
-    initialize( classProps, { StoreCollection, StoreModel }, { url, normalizeRequestData, parseResponse } ) {
+    initialize( classProps, { StoreCollectionFactory, StoreModelFactory }, { url, normalizeRequestData, parseResponse } ) {
         this.set( 'mapBounds', new google.maps.LatLngBounds() );
         this.set( 'geocoder', new google.maps.Geocoder() );
 
-        var stores = StoreCollection(
+        var stores = StoreCollectionFactory(
             {
-                url,
+                //url,
+                url: 'http://www.maxizoo.local'+url,
                 parse: parseResponse
             },
+            null,
             {
-                model: StoreModel
+                model: StoreModelFactory
             }
         );
 
         this.set( 'stores', stores );
-
-        /*this.set( 'stores', new StoreCollection(
-            {
-                model: StoreModel
-            },
-            {
-                url,
-                parse: parseResponse
-            }
-        ));*/
 
         console.log( 'stores', this.get('stores') );
 

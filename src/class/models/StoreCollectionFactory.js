@@ -1,15 +1,11 @@
 import { Collection } from 'backbone';
 
-import backboneExtend from '../vendor/backboneExtendDecorator';
+import backboneFactory from '../vendor/backboneFactory';
 
-export default @backboneExtend( Collection, {
-/*    constructor( options, classProps ) {
-
-    }*/
-
-    initialize: function( options, classProps ) {
+const storeCollection =  {
+    /*initialize: function( options, classProps ) {
         console.log('initialize', arguments);
-    },
+    },*/
 
     fetchStores: function( location, callback = () => {} ) {
         return this.fetch({
@@ -25,5 +21,6 @@ export default @backboneExtend( Collection, {
             }
         });
     }
+}
 
-})
+export default backboneFactory( storeCollection, Collection );
