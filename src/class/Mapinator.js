@@ -1,4 +1,8 @@
-import { EasyMaps, jQuery } from './vendor/index';
+import jQuery from 'jquery';
+
+var $ = jQuery;
+
+import EasyMaps from './vendor/EasyMaps.js';
 
 import AbstractServiceContainer from './models/AbstractServiceContainer';
 
@@ -14,6 +18,7 @@ export default class Mapinator {
         this.config = config;
 
         this.serviceContainer = this.createServiceContainer( config );
+        this.serviceContainer.set('jQuery', jQuery);
         this.bindServiceContainer( this.serviceContainer );
 
         this.addressView = this.createAddressView( config, this.serviceContainer );
@@ -123,7 +128,9 @@ export default class Mapinator {
             mapOptions: config.mapOptions,
             addressText: config.addresstext,
 
-            collection: serviceContainer.get('stores')
+            collection: serviceContainer.get('stores'),
+
+            jQuery: serviceContainer.get('jQuery')
         });
     }
     createMapView( config, serviceContainer ) {
@@ -135,7 +142,7 @@ export default class Mapinator {
             infoWindow: function( data ) {
                 if( !data ) return false;
 
-                var $info = $( config.infoWindowProto ).clone(true, true);
+                var $info = jQuery( config.infoWindowProto ).clone(true, true);
 
                 $info.removeClass('hidden');
 
@@ -149,7 +156,7 @@ export default class Mapinator {
                 var href = $info.find('.link-hours').attr('href');
                 $info.find('.link-hours').attr('href', href+data.id);
 
-                return $('<div></div>').append( $info ).html();
+                return jQuery('<div></div>').append( $info ).html();
             },
             collection: serviceContainer.get('stores')
         });

@@ -8,6 +8,11 @@ gulp.task('concat', function() {
             //'./node_modules/typeahead.js/dist/typeahead.bundle.js',
             //'./node_modules/typeahead-addresspicker/dist/typeahead-addresspicker.js',
 
+            './bower_components/jquery/dist/jquery.js',
+            './bower_components/typeahead.js/dist/bloodhound.js',
+            './bower_components/typeahead.js/dist/typeahead.bundle.js',
+            './bower_components/typeahead-addresspicker/dist/typeahead-addresspicker.js',
+
             './dist/main.js'
         ])
         .pipe(concat('mapinator.js'))

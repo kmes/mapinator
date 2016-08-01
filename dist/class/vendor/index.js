@@ -7,22 +7,27 @@ exports.jQuery = exports.EasyMaps = exports.Bloodhound = undefined;
 
 var _backbone = require('backbone');
 
-var _bind = function (jQuery) {
+var _bind = function (jQuery, window) {
+
     this.jQuery = this.$ = jQuery;
 
-    var Bloodhound = this.Bloodhound = require('typeahead.js/dist/bloodhound');
-    require('typeahead.js/dist/typeahead.jquery');
-    var EasyMaps = function (jQuery, Bloodhound) {
-        require('typeahead-addresspicker/dist/typeahead-addresspicker.js');
+    //let Bloodhound = this.Bloodhound = require('typeahead.js/dist/bloodhound');
+    require('./typeahead.js/dist/bloodhound');
+
+    require('./typeahead.js/dist/typeahead.jquery');
+    //require('./typeahead.js/dist/typeahead.bundle');
+
+    var EasyMaps = function (jQuery, Bloodhound, window) {
+        require('./typeahead-addresspicker/dist/typeahead-addresspicker.js');
         return require('./EasyMaps').default;
-    }.bind(this)(jQuery, Bloodhound);
+    }.bind(this)(jQuery, this.Bloodhound, window);
 
     return {
         jQuery: jQuery,
         Bloodhound: Bloodhound,
         EasyMaps: EasyMaps
     };
-}.bind(window)(_backbone.$);
+}.bind(window)(_backbone.$, window);
 
 var Bloodhound = _bind.Bloodhound;
 var EasyMaps = _bind.EasyMaps;

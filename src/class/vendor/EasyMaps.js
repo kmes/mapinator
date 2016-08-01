@@ -1,16 +1,8 @@
-/*
- Dependencies:
- - jQuery
- - Google maps v3
- - MarkerClusterer
-
- */
-
-
-var $ = jQuery;
 
 function EasyMaps( properties ) {
     var that = this;
+
+    this.$ = properties.jQuery || jQuery;
 
     var config = properties || {};
     if( !config.center ) {
@@ -584,13 +576,12 @@ EasyMaps.prototype.autocomplete = function( domElement, fnCallback ) {
     var pacContainer = '.pac-container';
 
     var fnFinal = function( place, el ) {
-        //$( pacContainer ).remove();
         fnCallback( place, el );
     };
 
     //var defaultCenter = 'Italia';
 
-    var $inputList = $( domElement );
+    var $inputList = that.$( domElement );
     $inputList.each(function(i, el) {
         (function(el) {
             var inputCenter = el;
@@ -602,18 +593,18 @@ EasyMaps.prototype.autocomplete = function( domElement, fnCallback ) {
 
             var setPacItem;
 
-            $(el).click(function(e) {
+            that.$(el).click(function(e) {
 
                 setTimeout(function() {
-                    $(e.target).select();
-                    autocomplete.pacContainer = autocomplete.pacContainer || $( pacContainer ).filter(':visible');
+                    that.$(e.target).select();
+                    autocomplete.pacContainer = autocomplete.pacContainer || that.$( pacContainer ).filter(':visible');
 
                 }, 200);
 
                 var isChanged = false;
 
-                $(el).unbind('keypress blur').bind('keypress blur', function(e) {
-                    var $this = $( this );
+                that.$(el).unbind('keypress blur').bind('keypress blur', function(e) {
+                    var $this = that.$( this );
 
                     if( e.type == 'blur' ) {
                         if( !isChanged ) {
@@ -689,7 +680,7 @@ EasyMaps.prototype.autocomplete = function( domElement, fnCallback ) {
                 var place = autocomplete.getPlace();
                 //console.log( place );
                 if( place.geometry && place.geometry.location ) {
-                    $(el).unbind('keypress blur');
+                    that.$(el).unbind('keypress blur');
                     clearInterval( setPacItem );
                     //console.log('listener');
                     fnFinal( place, el );
@@ -700,37 +691,6 @@ EasyMaps.prototype.autocomplete = function( domElement, fnCallback ) {
     });
 
 
-};
-
-$(function() {
-    jQuery.fn.easyAutocomplete = EasyMaps.prototype.autocomplete;
-});
-
-
-function PlacesEngine() {
-    this.predicted = [];
-    this.predictionError = false;
-}
-
-PlacesEngine.prototype.predictionComplete = function(predictions, status) {
-    this.predictionError = status != google.maps.places.PlacesServiceStatus.OK;
-    if( this.predictionError ) return false;
-
-    this.predicted = predictions;
-
-    return this.predicted;
-};
-
-
-PlacesEngine.prototype.prediction = function( text, fnCallback ) {
-    var self = this;
-    fnCallback = fnCallback || function() {};
-
-    var service = new google.maps.places.AutocompleteService();
-    service.getQueryPredictions({ input: text }, function(predictions, status) {
-        var result = self.predictionComplete(predictions, status);
-        fnCallback( result );
-    });
 };
 
 export default EasyMaps;

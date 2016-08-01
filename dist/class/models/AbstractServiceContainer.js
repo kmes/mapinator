@@ -30,6 +30,8 @@ var AbstractServiceContainer = function (_Model) {
 
         var classProps = {
             defaults: {
+                jQuery: null,
+
                 mapBounds: null,
                 geocoder: null,
 

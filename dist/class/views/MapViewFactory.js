@@ -21,9 +21,12 @@ var mapView = {
 
         var view = this;
 
+        var jQuery = serviceContainer.get('jQuery');
+
         var map = serviceContainer.get('map');
 
         var easyMap = new EasyMaps({
+            jQuery: jQuery,
             map: map,
             controls: {
                 'mapTypeControl': false,

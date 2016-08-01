@@ -6,7 +6,13 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _index = require('./vendor/index');
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _EasyMaps = require('./vendor/EasyMaps.js');
+
+var _EasyMaps2 = _interopRequireDefault(_EasyMaps);
 
 var _AbstractServiceContainer = require('./models/AbstractServiceContainer');
 
@@ -38,6 +44,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var $ = _jquery2.default;
+
 var Mapinator = function () {
     function Mapinator(config) {
         _classCallCheck(this, Mapinator);
@@ -45,6 +53,7 @@ var Mapinator = function () {
         this.config = config;
 
         this.serviceContainer = this.createServiceContainer(config);
+        this.serviceContainer.set('jQuery', _jquery2.default);
         this.bindServiceContainer(this.serviceContainer);
 
         this.addressView = this.createAddressView(config, this.serviceContainer);
@@ -156,7 +165,9 @@ var Mapinator = function () {
                 mapOptions: config.mapOptions,
                 addressText: config.addresstext,
 
-                collection: serviceContainer.get('stores')
+                collection: serviceContainer.get('stores'),
+
+                jQuery: serviceContainer.get('jQuery')
             });
         }
     }, {
@@ -165,12 +176,12 @@ var Mapinator = function () {
             return (0, _MapViewFactory2.default)({}, {
                 el: config.mapSelector,
                 serviceContainer: serviceContainer,
-                EasyMaps: _index.EasyMaps,
+                EasyMaps: _EasyMaps2.default,
                 markerIcon: config.getStoreIconPath(),
                 infoWindow: function infoWindow(data) {
                     if (!data) return false;
 
-                    var $info = $(config.infoWindowProto).clone(true, true);
+                    var $info = (0, _jquery2.default)(config.infoWindowProto).clone(true, true);
 
                     $info.removeClass('hidden');
 
@@ -183,7 +194,7 @@ var Mapinator = function () {
                     var href = $info.find('.link-hours').attr('href');
                     $info.find('.link-hours').attr('href', href + data.id);
 
-                    return $('<div></div>').append($info).html();
+                    return (0, _jquery2.default)('<div></div>').append($info).html();
                 },
                 collection: serviceContainer.get('stores')
             });

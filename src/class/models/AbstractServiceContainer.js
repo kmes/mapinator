@@ -4,6 +4,8 @@ export default class AbstractServiceContainer extends Model {
     constructor( { StoreCollectionFactory, StoreModelFactory }, { url, normalizeRequestData, parseResponse } ) {
         var classProps = {
             defaults: {
+                jQuery: null,
+
                 mapBounds: null,
                 geocoder: null,
 
