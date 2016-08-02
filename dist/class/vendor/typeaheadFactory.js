@@ -5,7 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = typeaheadFactory;
 function typeaheadFactory(jQuery, selector, options) {
-    require('typeahead');
+    require('typeahead.js/dist/typeahead.jquery.js');
 
-    return jQuery(selector).typeahead(null, options);
+    return function () {
+
+        return jQuery(selector).typeahead(null, options);
+    }.bind(window)();
 }

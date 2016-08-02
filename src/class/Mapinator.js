@@ -1,6 +1,6 @@
 import jQuery from 'jquery';
 
-var $ = jQuery;
+var $ = window.jQuery = window.$ = jQuery;
 
 import EasyMaps from './vendor/EasyMaps.js';
 
@@ -22,9 +22,6 @@ export default class Mapinator {
         this.bindServiceContainer( this.serviceContainer );
 
         this.addressView = this.createAddressView( config, this.serviceContainer );
-        //this.mapView = this.createMapView( config, this.serviceContainer );
-
-        //this.serviceContainer.setLocation( config.mapLocation, true );
     }
 
     createServiceContainer({ storesUrl }) {
@@ -123,7 +120,6 @@ export default class Mapinator {
             cancelAddressSelector: '.cancel-address',
             serviceContainer: serviceContainer,
             mapSelector: config.mapSelector,
-            AddressPicker: AddressPicker,
             mapLocation: config.mapLocation,
             mapOptions: config.mapOptions,
             addressText: config.addresstext,

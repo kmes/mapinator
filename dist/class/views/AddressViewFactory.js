@@ -26,46 +26,44 @@ var addressView = {
 
         var placeService = new google.maps.places.AutocompleteService();
 
-        (0, _typeaheadFactory2.default)(options.jQuery, view.el, {
-            display: 'description',
-            async: true,
-            source: function source(query, sync, async) {
-                placeService.getQueryPredictions({ input: query }, function (suggestions, status) {
-                    console.log('suggestions', suggestions);
+        (0, _typeaheadFactory2.default)({
+            jQuery: jQuery,
+            el: view.el,
+            options: null,
+            datasets: {
+                name: 'locations',
+                display: function display(suggestion) {
+                    return suggestion.description;
+                },
+                async: true,
+                source: function source(query, syncResults, asyncResults) {
+                    placeService.getQueryPredictions({ input: query }, function (suggestions, status) {
+                        console.log('suggestions', suggestions.map(function (sug) {
+                            return sug.description;
+                        }));
 
-                    async(suggestions);
-                });
+                        asyncResults(suggestions);
+                    });
+                }
             }
         });
 
-        /*if( options.addressText ) {
-            this.$el.val( options.addressText );
-        }
-         view.$el.bind('typeahead:selected', function(evt, place) {
-            placeService.getDetails(place, function( result ) {
-                var location = {
-                    lat: result.geometry.location.lat(),
-                    lng: result.geometry.location.lng()
-                };
-                options.serviceContainer.setLocation( location, true );
-                 view.$el.blur();
-                 /!*view.collection.fetch({
-                 data: location
-                 });*!/
-            });
+        (0, _typeaheadFactory2.default)(options.jQuery, view.el, {
+            //isplay: 'description',
+            async: true,
+            source: function source(query, sync, async) {
+                placeService.getQueryPredictions({ input: query }, function (suggestions, status) {
+                    console.log('suggestions', suggestions.map(function (sug) {
+                        return sug.description;
+                    }));
+
+                    sync(suggestions);
+                });
+            }
         });
-        options.serviceContainer.set('map', addressPicker.map );
-        options.serviceContainer.set('placeService', placeService );
-         if( options.cancelAddressSelector ) {
-            $( options.cancelAddressSelector ).on('click', function( evt ) {
-                view.$el.val('');
-            });
-        }*/
     },
     pickerHandler: function pickerHandler(evt, result) {
         var view = this;
-
-        //console.log('event', evt.keyCode);
 
         switch (evt.type) {
             case 'keyup':

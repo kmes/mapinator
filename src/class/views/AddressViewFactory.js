@@ -14,50 +14,38 @@ const addressView = {
 
         var placeService = new google.maps.places.AutocompleteService();
 
-        typeaheadFactory( options.jQuery, view.el, {
-            display: 'description',
-            async: true,
-            source: function( query, sync, async ) {
-                placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
-                    console.log('suggestions', suggestions);
+        typeaheadFactory({
+            jQuery,
+            el: view.el,
+            options: null,
+            datasets: {
+                name: 'locations',
+                display: ( suggestion ) => suggestion.description,
+                async: true,
+                source: function( query, syncResults, asyncResults ) {
+                    placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
+                        console.log('suggestions', suggestions.map((sug) => sug.description));
 
-                    async( suggestions );
-                });
+                        asyncResults( suggestions );
+                    });
+                }
             }
         });
 
-        /*if( options.addressText ) {
-            this.$el.val( options.addressText );
-        }
+        typeaheadFactory( options.jQuery, view.el, {
+            //isplay: 'description',
+            async: true,
+            source: function( query, sync, async ) {
+                placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
+                    console.log('suggestions', suggestions.map((sug) => sug.description));
 
-        view.$el.bind('typeahead:selected', function(evt, place) {
-            placeService.getDetails(place, function( result ) {
-                var location = {
-                    lat: result.geometry.location.lat(),
-                    lng: result.geometry.location.lng()
-                };
-                options.serviceContainer.setLocation( location, true );
-
-                view.$el.blur();
-
-                /!*view.collection.fetch({
-                 data: location
-                 });*!/
-            });
+                    sync( suggestions );
+                });
+            }
         });
-        options.serviceContainer.set('map', addressPicker.map );
-        options.serviceContainer.set('placeService', placeService );
-
-        if( options.cancelAddressSelector ) {
-            $( options.cancelAddressSelector ).on('click', function( evt ) {
-                view.$el.val('');
-            });
-        }*/
     },
     pickerHandler: function( evt, result ) {
         var view = this;
-
-        //console.log('event', evt.keyCode);
 
         switch( evt.type ) {
             case 'keyup' :

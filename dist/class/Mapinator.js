@@ -44,7 +44,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var $ = _jquery2.default;
+var $ = window.jQuery = window.$ = _jquery2.default;
 
 var Mapinator = function () {
     function Mapinator(config) {
@@ -57,9 +57,6 @@ var Mapinator = function () {
         this.bindServiceContainer(this.serviceContainer);
 
         this.addressView = this.createAddressView(config, this.serviceContainer);
-        //this.mapView = this.createMapView( config, this.serviceContainer );
-
-        //this.serviceContainer.setLocation( config.mapLocation, true );
     }
 
     _createClass(Mapinator, [{
@@ -160,7 +157,6 @@ var Mapinator = function () {
                 cancelAddressSelector: '.cancel-address',
                 serviceContainer: serviceContainer,
                 mapSelector: config.mapSelector,
-                AddressPicker: AddressPicker,
                 mapLocation: config.mapLocation,
                 mapOptions: config.mapOptions,
                 addressText: config.addresstext,
