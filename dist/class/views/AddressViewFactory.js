@@ -14,7 +14,13 @@ var _backboneFactory = require('../vendor/backboneFactory');
 
 var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
 
+var _bloodhound = require('typeahead.js/dist/bloodhound.js');
+
+var _bloodhound2 = _interopRequireDefault(_bloodhound);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//console.log('Bloodhound', Bloodhound);
 
 var addressView = {
     events: {
@@ -26,38 +32,44 @@ var addressView = {
 
         var placeService = new google.maps.places.AutocompleteService();
 
-        (0, _typeaheadFactory2.default)({
-            jQuery: jQuery,
+        /*typeaheadFactory({
+            jQuery,
             el: view.el,
             options: null,
             datasets: {
                 name: 'locations',
-                display: function display(suggestion) {
-                    return suggestion.description;
-                },
+                display: ( suggestion ) => suggestion.description,
                 async: true,
-                source: function source(query, syncResults, asyncResults) {
-                    placeService.getQueryPredictions({ input: query }, function (suggestions, status) {
-                        console.log('suggestions', suggestions.map(function (sug) {
-                            return sug.description;
-                        }));
-
-                        asyncResults(suggestions);
+                source: function( query, syncResults, asyncResults ) {
+                    placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
+                        console.log('suggestions', suggestions.map((sug) => sug.description));
+                         asyncResults( suggestions );
                     });
                 }
             }
-        });
+        });*/
 
-        (0, _typeaheadFactory2.default)(options.jQuery, view.el, {
-            //isplay: 'description',
-            async: true,
-            source: function source(query, sync, async) {
+        /*var sourcePlaces = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('description'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            identify: (obj) => obj.description,
+         });*/
+
+        (0, _typeaheadFactory2.default)(window, view.el, {
+            name: 'places',
+            //display: 'description',
+            //async: true,
+            source: function source(query, sync) {
+                //window.ssync = sync;
                 placeService.getQueryPredictions({ input: query }, function (suggestions, status) {
-                    console.log('suggestions', suggestions.map(function (sug) {
+                    var sugList = suggestions.map(function (sug) {
                         return sug.description;
-                    }));
+                    });
 
-                    sync(suggestions);
+                    console.log('suggestions', suggestions);
+                    console.log('sugList', sugList);
+
+                    sync(sugList);
                 });
             }
         });

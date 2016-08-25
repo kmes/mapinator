@@ -53,7 +53,7 @@ var Mapinator = function () {
         this.config = config;
 
         this.serviceContainer = this.createServiceContainer(config);
-        this.serviceContainer.set('jQuery', _jquery2.default);
+        this.serviceContainer.set('jQuery', $);
         this.bindServiceContainer(this.serviceContainer);
 
         this.addressView = this.createAddressView(config, this.serviceContainer);

@@ -4,6 +4,10 @@ import typeaheadFactory from '../vendor/typeaheadFactory';
 
 import backboneFactory from '../vendor/backboneFactory';
 
+import Bloodhound from 'typeahead.js/dist/bloodhound.js';
+
+//console.log('Bloodhound', Bloodhound);
+
 const addressView = {
     events: {
         'click': 'pickerHandler',
@@ -14,7 +18,7 @@ const addressView = {
 
         var placeService = new google.maps.places.AutocompleteService();
 
-        typeaheadFactory({
+        /*typeaheadFactory({
             jQuery,
             el: view.el,
             options: null,
@@ -30,16 +34,29 @@ const addressView = {
                     });
                 }
             }
-        });
+        });*/
 
-        typeaheadFactory( options.jQuery, view.el, {
-            //isplay: 'description',
-            async: true,
-            source: function( query, sync, async ) {
+        /*var sourcePlaces = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('description'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            identify: (obj) => obj.description,
+
+        });*/
+
+        typeaheadFactory( window, view.el, {
+            name: 'places',
+            //display: 'description',
+            //async: true,
+            source: function( query, sync ) {
+                //window.ssync = sync;
                 placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
-                    console.log('suggestions', suggestions.map((sug) => sug.description));
+                    var sugList = suggestions.map((sug) => sug.description);
 
-                    sync( suggestions );
+                    console.log('suggestions', suggestions);
+                    console.log('sugList', sugList);
+
+                    sync( sugList );
+
                 });
             }
         });

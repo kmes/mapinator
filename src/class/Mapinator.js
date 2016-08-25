@@ -18,7 +18,7 @@ export default class Mapinator {
         this.config = config;
 
         this.serviceContainer = this.createServiceContainer( config );
-        this.serviceContainer.set('jQuery', jQuery);
+        this.serviceContainer.set('jQuery', $);
         this.bindServiceContainer( this.serviceContainer );
 
         this.addressView = this.createAddressView( config, this.serviceContainer );

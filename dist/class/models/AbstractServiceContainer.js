@@ -46,7 +46,7 @@ var AbstractServiceContainer = function (_Model) {
                 }
             }
         };
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(AbstractServiceContainer).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelFactory: StoreModelFactory }, { url: url, normalizeRequestData: normalizeRequestData, parseResponse: parseResponse }));
+        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelFactory: StoreModelFactory }, { url: url, normalizeRequestData: normalizeRequestData, parseResponse: parseResponse }));
     }
 
     _createClass(AbstractServiceContainer, [{
