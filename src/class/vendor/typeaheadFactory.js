@@ -1,5 +1,7 @@
 import typeahead, { Bloodhound } from "typeahead.js-browserify";
 
+import PlacesBloodhoundEngine from './PlacesBloodhoundEngine';
+
 export default function typeaheadFactory( window, selector, datasets ) {
     //require('typeahead.js/dist/typeahead.bundle.js');
 
@@ -19,10 +21,20 @@ export default function typeaheadFactory( window, selector, datasets ) {
         ]
     });*/
 
+    /*var placeService = new google.maps.places.AutocompleteService();
+
     var placesSource = new Bloodhound({
         datumTokenizer: (obj) => Bloodhound.tokenizers.whitespace(obj.description),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        local: [
+        queryTokenizer: function(query) {
+            var engine = this;
+            placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
+                engine.add( suggestions );
+            });
+
+            return Bloodhound.tokenizers.whitespace( query );
+        },
+        local:
+        [
             {
                 description: 'milano assago'
             },
@@ -30,6 +42,10 @@ export default function typeaheadFactory( window, selector, datasets ) {
                 description: 'Milanoo'
             }
         ]
+    });*/
+
+    var placesSource = new PlacesBloodhoundEngine({
+        placeService: new google.maps.places.AutocompleteService()
     });
 
     return (function( window, placesSource ) {

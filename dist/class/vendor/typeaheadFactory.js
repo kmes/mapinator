@@ -12,6 +12,10 @@ var _typeahead = require('typeahead.js-browserify');
 
 var _typeahead2 = _interopRequireDefault(_typeahead);
 
+var _PlacesBloodhoundEngine = require('./PlacesBloodhoundEngine');
+
+var _PlacesBloodhoundEngine2 = _interopRequireDefault(_PlacesBloodhoundEngine);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function typeaheadFactory(window, selector, datasets) {
@@ -33,35 +37,29 @@ function typeaheadFactory(window, selector, datasets) {
         ]
     });*/
 
-    var placesSource = new _typeahead.Bloodhound({
-        datumTokenizer: function datumTokenizer(obj) {
-            return _typeahead.Bloodhound.tokenizers.whitespace(obj.description);
-        },
-        /*datumTokenizer: function(obj) {
-            //console.log('datumTokenizer', obj);
-            console.log( 'tokenizers', Bloodhound.tokenizers.whitespace(obj.description) );
-             //return obj.description;
-             return Bloodhound.tokenizers.whitespace(obj.description);
-             //return Bloodhound.tokenizers.whitespace.call(this, arguments);
-            //return Bloodhound.tokenizers.obj.whitespace('value').call(this, arguments);
-             //return Bloodhound.tokenizers.obj.whitespace('description')( obj );
-        },
+    /*var placeService = new google.maps.places.AutocompleteService();
+     var placesSource = new Bloodhound({
+        datumTokenizer: (obj) => Bloodhound.tokenizers.whitespace(obj.description),
         queryTokenizer: function(query) {
-            //console.log('queryTokenizer', query);
-            console.log( 'tokenizers', Bloodhound.tokenizers.whitespace( query ) );
-             //return query;
-             return Bloodhound.tokenizers.whitespace(query);
-        },*/
-        /*identify: (obj) => {
-            console.log('identify', obj);
-             return obj.description;
-        },*/
-        queryTokenizer: _typeahead.Bloodhound.tokenizers.whitespace,
-        local: [{
-            description: 'milano assago'
-        }, {
-            description: 'Milanoo'
-        }]
+            var engine = this;
+            placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
+                engine.add( suggestions );
+            });
+             return Bloodhound.tokenizers.whitespace( query );
+        },
+        local:
+        [
+            {
+                description: 'milano assago'
+            },
+            {
+                description: 'Milanoo'
+            }
+        ]
+    });*/
+
+    var placesSource = new _PlacesBloodhoundEngine2.default({
+        placeService: new google.maps.places.AutocompleteService()
     });
 
     return function (window, placesSource) {

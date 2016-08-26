@@ -18064,7 +18064,7 @@ var Mapinator = function () {
 
 exports.default = Mapinator;
 
-},{"./helper/helper":8,"./models/AbstractServiceContainer":9,"./models/StoreCollectionFactory":10,"./models/StoreModelFactory":11,"./vendor/EasyMaps.js":12,"./views/AddressViewFactory":15,"./views/MapViewFactory":16,"jquery":2}],8:[function(require,module,exports){
+},{"./helper/helper":8,"./models/AbstractServiceContainer":9,"./models/StoreCollectionFactory":10,"./models/StoreModelFactory":11,"./vendor/EasyMaps.js":12,"./views/AddressViewFactory":16,"./views/MapViewFactory":17,"jquery":2}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18256,7 +18256,7 @@ var storeCollection = {
 
 exports.default = (0, _backboneFactory2.default)(storeCollection, _backbone.Collection);
 
-},{"../vendor/backboneFactory":13,"backbone":1}],11:[function(require,module,exports){
+},{"../vendor/backboneFactory":14,"backbone":1}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18279,7 +18279,7 @@ var storeModel = {
 
 exports.default = (0, _backboneFactory2.default)(storeModel, _backbone.Model);
 
-},{"../vendor/backboneFactory":13,"backbone":1}],12:[function(require,module,exports){
+},{"../vendor/backboneFactory":14,"backbone":1}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18946,6 +18946,107 @@ EasyMaps.prototype.autocomplete = function (domElement, fnCallback) {
 exports.default = EasyMaps;
 
 },{}],13:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _typeahead = require('typeahead.js-browserify');
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var PlacesBloodhoundEngine = function (_Bloodhound) {
+    _inherits(PlacesBloodhoundEngine, _Bloodhound);
+
+    function PlacesBloodhoundEngine() {
+        var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+        _classCallCheck(this, PlacesBloodhoundEngine);
+
+        var _this = _possibleConstructorReturn(this, (PlacesBloodhoundEngine.__proto__ || Object.getPrototypeOf(PlacesBloodhoundEngine)).call(this, _extends({}, options, {
+            datumTokenizer: function datumTokenizer(obj) {
+                return _typeahead.Bloodhound.tokenizers.whitespace(obj.description);
+            },
+            queryTokenizer: function queryTokenizer(query) {
+                _this.onSearch(query);
+
+                return _typeahead.Bloodhound.tokenizers.whitespace(query);
+            },
+            identify: function identify(obj) {
+                return obj.id;
+            }
+        })));
+
+        _this.setPlaceService(options.placeService);
+        return _this;
+    }
+
+    _createClass(PlacesBloodhoundEngine, [{
+        key: 'onSearch',
+        value: function onSearch(query) {
+            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+
+            var self = this;
+
+            this.searchPlace(query, function (suggestions, status) {
+                self.add(suggestions);
+
+                //console.log('sug added', suggestions);
+
+                callback(suggestions);
+            });
+        }
+    }, {
+        key: 'setPlaceService',
+        value: function setPlaceService(placeService) {
+            return this.placeService = placeService;
+        }
+    }, {
+        key: 'getPlaceService',
+        value: function getPlaceService() {
+            return this.placeService || null;
+        }
+    }, {
+        key: 'searchPlace',
+        value: function searchPlace(query) {
+            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+
+            var self = this;
+
+            var placeService = this.getPlaceService();
+            if (!placeService) {
+                callback(false);
+                return false;
+            }
+
+            placeService.getPlacePredictions({
+                input: query,
+                types: ['(cities)'],
+                componentRestrictions: {
+                    country: 'it'
+                }
+            }, function (suggestions, status) {
+                console.log('suggestions', suggestions);
+                callback(suggestions, status);
+            });
+        }
+    }]);
+
+    return PlacesBloodhoundEngine;
+}(_typeahead.Bloodhound);
+
+exports.default = PlacesBloodhoundEngine;
+
+},{"typeahead.js-browserify":3}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18973,7 +19074,7 @@ function backboneFactory(customObj, BackboneClass) {
 
 exports.default = backboneFactory;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18987,6 +19088,10 @@ exports.default = typeaheadFactory;
 var _typeahead = require('typeahead.js-browserify');
 
 var _typeahead2 = _interopRequireDefault(_typeahead);
+
+var _PlacesBloodhoundEngine = require('./PlacesBloodhoundEngine');
+
+var _PlacesBloodhoundEngine2 = _interopRequireDefault(_PlacesBloodhoundEngine);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19009,35 +19114,29 @@ function typeaheadFactory(window, selector, datasets) {
         ]
     });*/
 
-    var placesSource = new _typeahead.Bloodhound({
-        datumTokenizer: function datumTokenizer(obj) {
-            return _typeahead.Bloodhound.tokenizers.whitespace(obj.description);
-        },
-        /*datumTokenizer: function(obj) {
-            //console.log('datumTokenizer', obj);
-            console.log( 'tokenizers', Bloodhound.tokenizers.whitespace(obj.description) );
-             //return obj.description;
-             return Bloodhound.tokenizers.whitespace(obj.description);
-             //return Bloodhound.tokenizers.whitespace.call(this, arguments);
-            //return Bloodhound.tokenizers.obj.whitespace('value').call(this, arguments);
-             //return Bloodhound.tokenizers.obj.whitespace('description')( obj );
-        },
+    /*var placeService = new google.maps.places.AutocompleteService();
+     var placesSource = new Bloodhound({
+        datumTokenizer: (obj) => Bloodhound.tokenizers.whitespace(obj.description),
         queryTokenizer: function(query) {
-            //console.log('queryTokenizer', query);
-            console.log( 'tokenizers', Bloodhound.tokenizers.whitespace( query ) );
-             //return query;
-             return Bloodhound.tokenizers.whitespace(query);
-        },*/
-        /*identify: (obj) => {
-            console.log('identify', obj);
-             return obj.description;
-        },*/
-        queryTokenizer: _typeahead.Bloodhound.tokenizers.whitespace,
-        local: [{
-            description: 'milano assago'
-        }, {
-            description: 'Milanoo'
-        }]
+            var engine = this;
+            placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
+                engine.add( suggestions );
+            });
+             return Bloodhound.tokenizers.whitespace( query );
+        },
+        local:
+        [
+            {
+                description: 'milano assago'
+            },
+            {
+                description: 'Milanoo'
+            }
+        ]
+    });*/
+
+    var placesSource = new _PlacesBloodhoundEngine2.default({
+        placeService: new google.maps.places.AutocompleteService()
     });
 
     return function (window, placesSource) {
@@ -19053,7 +19152,7 @@ function typeaheadFactory(window, selector, datasets) {
     }.bind(window)(window, placesSource);
 }
 
-},{"typeahead.js-browserify":3}],15:[function(require,module,exports){
+},{"./PlacesBloodhoundEngine":13,"typeahead.js-browserify":3}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19152,7 +19251,7 @@ var addressView = {
 
 exports.default = (0, _backboneFactory2.default)(addressView, _backbone.View);
 
-},{"../vendor/backboneFactory":13,"../vendor/typeaheadFactory":14,"backbone":1,"typeahead.js/dist/bloodhound.js":4}],16:[function(require,module,exports){
+},{"../vendor/backboneFactory":14,"../vendor/typeaheadFactory":15,"backbone":1,"typeahead.js/dist/bloodhound.js":4}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19244,7 +19343,7 @@ var mapView = {
 
 exports.default = (0, _backboneFactory2.default)(mapView, _backbone.View);
 
-},{"../vendor/backboneFactory":13,"backbone":1}],17:[function(require,module,exports){
+},{"../vendor/backboneFactory":14,"backbone":1}],18:[function(require,module,exports){
 'use strict';
 
 var _Mapinator = require('./class/Mapinator');
@@ -19258,4 +19357,4 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 window.Mapinator = _Mapinator2.default;
 //window.AbstractServiceContainer = AbstractServiceContainer;
 
-},{"./class/Mapinator":7}]},{},[17]);
+},{"./class/Mapinator":7}]},{},[18]);
