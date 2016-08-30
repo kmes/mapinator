@@ -16,6 +16,9 @@ var mapView = {
     initialize: function initialize(_ref) {
         var serviceContainer = _ref.serviceContainer;
         var EasyMaps = _ref.EasyMaps;
+        var mapLocation = _ref.mapLocation;
+        var mapZoom = _ref.mapZoom;
+        var mapControls = _ref.mapControls;
         var markerIcon = _ref.markerIcon;
         var infoWindow = _ref.infoWindow;
 
@@ -27,18 +30,15 @@ var mapView = {
             jQuery: jQuery,
             //map: map,
             elem: view.el,
-            controls: {
-                'mapTypeControl': false,
-                'navigationControl': false,
-                'scrollwheel': false,
-                'streetViewControl': false,
-                'panControl': false,
-                'zoomControl': false,
-                'scaleControl': true,
-                'overviewMapControl': false,
-                'disableDoubleClickZoom': false,
-                'draggable': true
-            }
+            center: mapLocation,
+            zoom: mapZoom,
+            controls: mapControls
+        });
+
+        easyMap.addEventListener('onLoaded', function () {
+            easyMap.setZoom(mapZoom);
+
+            view.$el.trigger('map:loaded');
         });
 
         var map = easyMap.mapObj;

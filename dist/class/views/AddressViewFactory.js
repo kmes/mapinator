@@ -4,10 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-//import PlacesAdapter from '../vendor/PlacesAdapter';
-
-
 var _backbone = require('backbone');
 
 var _PlacesBloodhoundEngine = require('../vendor/PlacesBloodhoundEngine');
@@ -24,29 +20,46 @@ var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+//import PlacesAdapter from '../vendor/PlacesAdapter';
 var addressView = {
     events: {
-        'click': 'pickerHandler',
         'keyup': 'pickerHandler',
-        'typeahead:select': 'pickerHandler'
+        'click': 'pickerHandler'
     },
     initialize: function initialize(options) {
         var view = this;
 
         var serviceAdapter = options.serviceContainer.get('placesAdapter');
+        var placeEngine = new _PlacesBloodhoundEngine2.default({ serviceAdapter: serviceAdapter });
 
         (0, _typeaheadFactory2.default)(view.el, {
-            source: new _PlacesBloodhoundEngine2.default({ serviceAdapter: serviceAdapter })
+            source: placeEngine
         });
 
-        view.$el.bind('typeahead:select', function (evt, result) {
-            serviceAdapter.fetchLatLng({ placeId: result['place_id'] }, function (result) {
-                if (!result) throw new Error('Error to fetch place position');
+        view.el.value = options.address;
 
-                view.$el.trigger('address:select', _extends({}, result, {
-                    lat: result.geometry.location.lat(),
-                    lng: result.geometry.location.lng()
-                }));
+        view.$el.bind('typeahead:select', function (evt, result) {
+            if (result.lat && result.lng) {
+                view.$el.trigger('address:select', result);
+                return;
+            }
+
+            serviceAdapter.fetchLatLng({ placeId: result['place_id'] }, function (placeDetails) {
+                if (!placeDetails) throw new Error('Error to fetch place position');
+
+                /*var newResult = {
+                    ...result,
+                    lat: placeDetails.geometry.location.lat(),
+                    lng: placeDetails.geometry.location.lng()
+                };*/
+                result.lat = placeDetails.geometry.location.lat();
+                result.lng = placeDetails.geometry.location.lng();
+
+                //console.log('fetchLatLng', result);
+
+                //placeEngine.add( [newResult] );
+
+                view.$el.trigger('address:select', result);
             });
         });
     },
@@ -55,18 +68,24 @@ var addressView = {
         var input = view.el;
         var $input = jQuery(input);
 
+        var selectFirst = function selectFirst() {
+            setTimeout(function () {
+                if (!jQuery('.tt-dataset-0').length || !jQuery('.tt-dataset-0').find('.tt-suggestion').length) return;
+                jQuery('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
+            }, 200);
+        };
+
         switch (evt.type) {
             case 'keyup':
                 var keyCode = evt.keyCode || evt.which;
                 if (keyCode == 40 || keyCode == 38) {
                     break;
                 }
-                setTimeout(function () {
-                    jQuery('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
-                }, 200);
+                selectFirst();
                 break;
             case 'click':
                 input.setSelectionRange(0, input.value.length);
+                selectFirst();
                 break;
         }
     }

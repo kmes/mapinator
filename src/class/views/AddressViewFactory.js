@@ -3,42 +3,66 @@ import { View } from 'backbone';
 import PlacesBloodhoundEngine from '../vendor/PlacesBloodhoundEngine';
 //import PlacesAdapter from '../vendor/PlacesAdapter';
 import typeaheadFactory from '../vendor/typeaheadFactory';
-
 import backboneFactory from '../vendor/backboneFactory';
 
 
 const addressView = {
     events: {
-        'click': 'pickerHandler',
         'keyup': 'pickerHandler',
-        'typeahead:select': 'pickerHandler'
+        'click': 'pickerHandler'
     },
     initialize: function( options ) {
         var view = this;
 
         var serviceAdapter = options.serviceContainer.get('placesAdapter');
+        var placeEngine = new PlacesBloodhoundEngine({ serviceAdapter });
 
         typeaheadFactory( view.el, {
-            source: new PlacesBloodhoundEngine({ serviceAdapter })
+            source: placeEngine
         });
+
+        view.el.value = options.address;
 
         view.$el.bind('typeahead:select', function( evt, result ) {
-            serviceAdapter.fetchLatLng({ placeId: result['place_id'] }, function( result ) {
-                if( !result ) throw new Error('Error to fetch place position');
+            if( result.lat && result.lng ) {
+                view.$el.trigger('address:select', result);
+                return;
+            }
 
-                view.$el.trigger('address:select', {
+            serviceAdapter.fetchLatLng({ placeId: result['place_id'] }, function( placeDetails ) {
+                if( !placeDetails ) throw new Error('Error to fetch place position');
+
+                /*var newResult = {
                     ...result,
-                    lat: result.geometry.location.lat(),
-                    lng: result.geometry.location.lng()
-                });
+                    lat: placeDetails.geometry.location.lat(),
+                    lng: placeDetails.geometry.location.lng()
+                };*/
+                result.lat = placeDetails.geometry.location.lat();
+                result.lng = placeDetails.geometry.location.lng();
+
+                //console.log('fetchLatLng', result);
+
+                //placeEngine.add( [newResult] );
+
+                view.$el.trigger( 'address:select', result );
             });
 
+
+
         });
+
     },
     pickerHandler: function( evt, result ) {
         var view = this;
         var input = view.el;
         var $input = jQuery( input );
+
+        var selectFirst = function() {
+            setTimeout(function() {
+                if( !jQuery('.tt-dataset-0').length || !jQuery('.tt-dataset-0').find('.tt-suggestion').length ) return;
+                jQuery('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
+            }, 200);
+        };
 
         switch( evt.type ) {
             case 'keyup' :
@@ -46,12 +70,11 @@ const addressView = {
                 if( keyCode == 40 || keyCode == 38 ) {
                     break;
                 }
-                setTimeout(function() {
-                    jQuery('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
-                }, 200);
+                selectFirst();
                 break;
             case 'click' :
                 input.setSelectionRange(0, input.value.length);
+                selectFirst();
                 break;
         }
     }

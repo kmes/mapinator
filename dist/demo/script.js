@@ -1,20 +1,33 @@
 var config = {
     mapSelector: '#map',
     mapView: null,
-    mapOptions: {
-        zoom: 4,
-        center:  {
-            lat: 41.2053167,
-            lng: 8.085248
-        },
+    /*mapOptions: {
+        zoom: 5,
+        /!*center:  {
+            lat: 41.9027835,
+            lng: 12.4963655
+        },*!/
         mapTypeControl: false,
         streetViewControl: false,
         scrollwheel: false
+    },*/
+    address: 'Italia',
+    mapLocation:  {
+        lat: 41.9027835,
+        lng: 12.4963655
     },
-    addresstext: 'Italia',
-    mapLocation: {
-        lat: 41.2053167,
-        lng: 8.085248
+    mapZoom: 10,
+    mapControls: {
+        'mapTypeControl': false,
+        'navigationControl': false,
+        'scrollwheel': false,
+        'streetViewControl': false,
+        'panControl': false,
+        'zoomControl': false,
+        'scaleControl': true,
+        'overviewMapControl': false,
+        'disableDoubleClickZoom': false,
+        'draggable': true
     },
     getMapLocation: function() {
         return this.mapLocation;

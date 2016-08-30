@@ -24,6 +24,10 @@ export default class Mapinator {
         this.addressView = this.createAddressView( config, this.serviceContainer );
 
         this.mapView = this.createMapView( config, this.serviceContainer );
+        this.mapView.$el.bind('map:loaded', ( evt ) => {
+            this.serviceContainer.setLocation( config.mapLocation );
+            this.mapView.$el.unbind('map:loaded');
+        });
 
         this.bindEvents();
     }
@@ -32,9 +36,11 @@ export default class Mapinator {
         var serviceContainer = this.serviceContainer;
 
         serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
+            //console.log('new mapLocation', mapLocation);
+
             var easyMap = serviceContainer.get('easyMap');
             easyMap.setCenter(mapLocation.lat, mapLocation.lng);
-            easyMap.setZoom(10);
+            //easyMap.setZoom(10);
         });
         serviceContainer.listenToOnce( serviceContainer.get('stores'), 'sync', function( stores ) {
             serviceContainer.get('easyMap').fitCenterZoomToMarkers();
@@ -44,7 +50,9 @@ export default class Mapinator {
             });
         });
 
-        this.addressView.$el.bind('address:select', ( evt, result ) => {
+        this.addressView.$el.bind('address:select', function( evt, result ) {
+            //console.log('address:select', result);
+
             serviceContainer.setLocation({
                 lat: result.lat,
                 lng: result.lng
@@ -125,7 +133,6 @@ export default class Mapinator {
             }
         );
     }
-
     bindServiceContainer( serviceContainer ) {
         serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
             var easyMap = serviceContainer.get('easyMap');
@@ -148,10 +155,10 @@ export default class Mapinator {
             el: config.addressSelector,
             cancelAddressSelector: '.cancel-address',
             serviceContainer: serviceContainer,
-            mapSelector: config.mapSelector,
+            /*mapSelector: config.mapSelector,
             mapLocation: config.mapLocation,
-            mapOptions: config.mapOptions,
-            addressText: config.addresstext,
+            mapOptions: config.mapOptions,*/
+            address: config.address,
 
             collection: serviceContainer.get('stores'),
 
@@ -163,6 +170,20 @@ export default class Mapinator {
             el: config.mapSelector,
             serviceContainer: serviceContainer,
             EasyMaps: EasyMaps,
+            mapLocation: config.mapLocation,
+            mapZoom: config.mapZoom,
+            mapControls: config.mapControls || {
+                'mapTypeControl': false,
+                'navigationControl': false,
+                'scrollwheel': false,
+                'streetViewControl': false,
+                'panControl': false,
+                'zoomControl': false,
+                'scaleControl': true,
+                'overviewMapControl': false,
+                'disableDoubleClickZoom': false,
+                'draggable': true
+            },
             markerIcon: config.getStoreIconPath(),
             infoWindow: function( data ) {
                 if( !data ) return false;
