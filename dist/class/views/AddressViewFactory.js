@@ -4,7 +4,15 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+//import PlacesAdapter from '../vendor/PlacesAdapter';
+
+
 var _backbone = require('backbone');
+
+var _PlacesBloodhoundEngine = require('../vendor/PlacesBloodhoundEngine');
+
+var _PlacesBloodhoundEngine2 = _interopRequireDefault(_PlacesBloodhoundEngine);
 
 var _typeaheadFactory = require('../vendor/typeaheadFactory');
 
@@ -14,68 +22,38 @@ var _backboneFactory = require('../vendor/backboneFactory');
 
 var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
 
-var _bloodhound = require('typeahead.js/dist/bloodhound.js');
-
-var _bloodhound2 = _interopRequireDefault(_bloodhound);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-//console.log('Bloodhound', Bloodhound);
 
 var addressView = {
     events: {
         'click': 'pickerHandler',
-        'keyup': 'pickerHandler'
+        'keyup': 'pickerHandler',
+        'typeahead:select': 'pickerHandler'
     },
     initialize: function initialize(options) {
         var view = this;
 
-        var placeService = new google.maps.places.AutocompleteService();
+        var serviceAdapter = options.serviceContainer.get('placesAdapter');
 
-        /*typeaheadFactory({
-            jQuery,
-            el: view.el,
-            options: null,
-            datasets: {
-                name: 'locations',
-                display: ( suggestion ) => suggestion.description,
-                async: true,
-                source: function( query, syncResults, asyncResults ) {
-                    placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
-                        console.log('suggestions', suggestions.map((sug) => sug.description));
-                         asyncResults( suggestions );
-                    });
-                }
-            }
-        });*/
+        (0, _typeaheadFactory2.default)(view.el, {
+            source: new _PlacesBloodhoundEngine2.default({ serviceAdapter: serviceAdapter })
+        });
 
-        /*var sourcePlaces = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('description'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            identify: (obj) => obj.description,
-         });*/
+        view.$el.bind('typeahead:select', function (evt, result) {
+            serviceAdapter.fetchLatLng({ placeId: result['place_id'] }, function (result) {
+                if (!result) throw new Error('Error to fetch place position');
 
-        (0, _typeaheadFactory2.default)(window, view.el, {
-            name: 'places',
-            //display: 'description',
-            //async: true,
-            source: function source(query, sync) {
-                //window.ssync = sync;
-                placeService.getQueryPredictions({ input: query }, function (suggestions, status) {
-                    var sugList = suggestions.map(function (sug) {
-                        return sug.description;
-                    });
-
-                    console.log('suggestions', suggestions);
-                    console.log('sugList', sugList);
-
-                    sync(sugList);
-                });
-            }
+                view.$el.trigger('address:select', _extends({}, result, {
+                    lat: result.geometry.location.lat(),
+                    lng: result.geometry.location.lng()
+                }));
+            });
         });
     },
     pickerHandler: function pickerHandler(evt, result) {
         var view = this;
+        var input = view.el;
+        var $input = jQuery(input);
 
         switch (evt.type) {
             case 'keyup':
@@ -84,11 +62,11 @@ var addressView = {
                     break;
                 }
                 setTimeout(function () {
-                    $('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
+                    jQuery('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
                 }, 200);
                 break;
             case 'click':
-                view.el.setSelectionRange(0, view.el.value.length);
+                input.setSelectionRange(0, input.value.length);
                 break;
         }
     }

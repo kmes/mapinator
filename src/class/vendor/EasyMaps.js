@@ -140,8 +140,7 @@ EasyMaps.prototype.resetBounds = function() {
 };
 
 EasyMaps.prototype.setDomElem = function( elem ) {
-
-    return this.domElem = document.querySelector( elem );
+    return this.domElem = elem instanceof HTMLElement ? elem : document.querySelector( elem );
 };
 
 EasyMaps.prototype.getCenter = function() {

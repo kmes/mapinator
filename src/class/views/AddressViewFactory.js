@@ -1,68 +1,44 @@
 import { View } from 'backbone';
 
+import PlacesBloodhoundEngine from '../vendor/PlacesBloodhoundEngine';
+//import PlacesAdapter from '../vendor/PlacesAdapter';
 import typeaheadFactory from '../vendor/typeaheadFactory';
 
 import backboneFactory from '../vendor/backboneFactory';
 
-import Bloodhound from 'typeahead.js/dist/bloodhound.js';
-
-//console.log('Bloodhound', Bloodhound);
 
 const addressView = {
     events: {
         'click': 'pickerHandler',
-        'keyup': 'pickerHandler'
+        'keyup': 'pickerHandler',
+        'typeahead:select': 'pickerHandler'
     },
     initialize: function( options ) {
         var view = this;
 
-        var placeService = new google.maps.places.AutocompleteService();
+        var serviceAdapter = options.serviceContainer.get('placesAdapter');
 
-        /*typeaheadFactory({
-            jQuery,
-            el: view.el,
-            options: null,
-            datasets: {
-                name: 'locations',
-                display: ( suggestion ) => suggestion.description,
-                async: true,
-                source: function( query, syncResults, asyncResults ) {
-                    placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
-                        console.log('suggestions', suggestions.map((sug) => sug.description));
+        typeaheadFactory( view.el, {
+            source: new PlacesBloodhoundEngine({ serviceAdapter })
+        });
 
-                        asyncResults( suggestions );
-                    });
-                }
-            }
-        });*/
+        view.$el.bind('typeahead:select', function( evt, result ) {
+            serviceAdapter.fetchLatLng({ placeId: result['place_id'] }, function( result ) {
+                if( !result ) throw new Error('Error to fetch place position');
 
-        /*var sourcePlaces = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('description'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            identify: (obj) => obj.description,
-
-        });*/
-
-        typeaheadFactory( window, view.el, {
-            name: 'places',
-            //display: 'description',
-            //async: true,
-            source: function( query, sync ) {
-                //window.ssync = sync;
-                placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
-                    var sugList = suggestions.map((sug) => sug.description);
-
-                    console.log('suggestions', suggestions);
-                    console.log('sugList', sugList);
-
-                    sync( sugList );
-
+                view.$el.trigger('address:select', {
+                    ...result,
+                    lat: result.geometry.location.lat(),
+                    lng: result.geometry.location.lng()
                 });
-            }
+            });
+
         });
     },
     pickerHandler: function( evt, result ) {
         var view = this;
+        var input = view.el;
+        var $input = jQuery( input );
 
         switch( evt.type ) {
             case 'keyup' :
@@ -71,11 +47,11 @@ const addressView = {
                     break;
                 }
                 setTimeout(function() {
-                    $('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
+                    jQuery('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
                 }, 200);
                 break;
             case 'click' :
-                view.el.setSelectionRange(0, view.el.value.length);
+                input.setSelectionRange(0, input.value.length);
                 break;
         }
     }

@@ -10,6 +10,12 @@ exports.AbstractServiceContainerClassFactory = AbstractServiceContainerClassFact
 
 var _backbone = require('backbone');
 
+var _PlacesAdapter = require('../vendor/PlacesAdapter');
+
+var _PlacesAdapter2 = _interopRequireDefault(_PlacesAdapter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -60,6 +66,8 @@ var AbstractServiceContainer = function (_Model) {
 
             this.set('mapBounds', new google.maps.LatLngBounds());
             this.set('geocoder', new google.maps.Geocoder());
+
+            this.set('placesAdapter', new _PlacesAdapter2.default());
 
             var stores = StoreCollectionFactory({
                 //url,

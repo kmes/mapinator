@@ -1,6 +1,6 @@
 import jQuery from 'jquery';
 
-var $ = window.jQuery = window.$ = jQuery;
+var $ = window ? window.jQuery || window.$ || (window.jQuery = jQuery) : jQuery;
 
 import EasyMaps from './vendor/EasyMaps.js';
 
@@ -19,9 +19,37 @@ export default class Mapinator {
 
         this.serviceContainer = this.createServiceContainer( config );
         this.serviceContainer.set('jQuery', $);
-        this.bindServiceContainer( this.serviceContainer );
+        //this.bindServiceContainer( this.serviceContainer );
 
         this.addressView = this.createAddressView( config, this.serviceContainer );
+
+        this.mapView = this.createMapView( config, this.serviceContainer );
+
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        var serviceContainer = this.serviceContainer;
+
+        serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
+            var easyMap = serviceContainer.get('easyMap');
+            easyMap.setCenter(mapLocation.lat, mapLocation.lng);
+            easyMap.setZoom(10);
+        });
+        serviceContainer.listenToOnce( serviceContainer.get('stores'), 'sync', function( stores ) {
+            serviceContainer.get('easyMap').fitCenterZoomToMarkers();
+
+            this.listenTo( this.get('stores'), 'sync', function( stores ) {
+                this.fitMapToNearestMarkers( 2 );
+            });
+        });
+
+        this.addressView.$el.bind('address:select', ( evt, result ) => {
+            serviceContainer.setLocation({
+                lat: result.lat,
+                lng: result.lng
+            });
+        });
     }
 
     createServiceContainer({ storesUrl }) {
@@ -97,6 +125,7 @@ export default class Mapinator {
             }
         );
     }
+
     bindServiceContainer( serviceContainer ) {
         serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
             var easyMap = serviceContainer.get('easyMap');

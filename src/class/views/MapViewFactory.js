@@ -8,11 +8,10 @@ const mapView = {
 
         var jQuery = serviceContainer.get('jQuery');
 
-        var map = serviceContainer.get('map');
-
         var easyMap = new EasyMaps({
             jQuery: jQuery,
-            map: map,
+            //map: map,
+            elem: view.el,
             controls: {
                 'mapTypeControl': false,
                 'navigationControl': false,
@@ -26,7 +25,11 @@ const mapView = {
                 'draggable': true
             }
         });
+
+        var map = easyMap.mapObj;
+
         serviceContainer.set('easyMap', easyMap);
+        serviceContainer.set('map', map);
 
         map.addListener('bounds_changed', function() {
             window.clearTimeout( view._t );

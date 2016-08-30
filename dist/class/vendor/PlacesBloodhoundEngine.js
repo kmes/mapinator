@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -8,7 +8,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _typeahead = require('typeahead.js-browserify');
+var _bloodhound = require("typeahead.js/dist/bloodhound");
+
+var _bloodhound2 = _interopRequireDefault(_bloodhound);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -26,74 +30,48 @@ var PlacesBloodhoundEngine = function (_Bloodhound) {
 
         var _this = _possibleConstructorReturn(this, (PlacesBloodhoundEngine.__proto__ || Object.getPrototypeOf(PlacesBloodhoundEngine)).call(this, _extends({}, options, {
             datumTokenizer: function datumTokenizer(obj) {
-                return _typeahead.Bloodhound.tokenizers.whitespace(obj.description);
+                return _bloodhound2.default.tokenizers.whitespace(obj.description);
             },
             queryTokenizer: function queryTokenizer(query) {
                 _this.onSearch(query);
 
-                return _typeahead.Bloodhound.tokenizers.whitespace(query);
+                return _bloodhound2.default.tokenizers.whitespace(query);
             },
             identify: function identify(obj) {
                 return obj.id;
             }
         })));
 
-        _this.setPlaceService(options.placeService);
+        _this.setServiceAdapter(options.serviceAdapter);
         return _this;
     }
 
     _createClass(PlacesBloodhoundEngine, [{
-        key: 'onSearch',
+        key: "onSearch",
         value: function onSearch(query) {
             var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 
             var self = this;
 
-            this.searchPlace(query, function (suggestions, status) {
+            this.getServiceAdapter().search(query, function (suggestions, status) {
                 self.add(suggestions);
-
-                //console.log('sug added', suggestions);
 
                 callback(suggestions);
             });
         }
     }, {
-        key: 'setPlaceService',
-        value: function setPlaceService(placeService) {
-            return this.placeService = placeService;
+        key: "setServiceAdapter",
+        value: function setServiceAdapter(serviceAdapter) {
+            return this.serviceAdapter = serviceAdapter;
         }
     }, {
-        key: 'getPlaceService',
-        value: function getPlaceService() {
-            return this.placeService || null;
-        }
-    }, {
-        key: 'searchPlace',
-        value: function searchPlace(query) {
-            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
-
-            var self = this;
-
-            var placeService = this.getPlaceService();
-            if (!placeService) {
-                callback(false);
-                return false;
-            }
-
-            placeService.getPlacePredictions({
-                input: query,
-                types: ['(cities)'],
-                componentRestrictions: {
-                    country: 'it'
-                }
-            }, function (suggestions, status) {
-                console.log('suggestions', suggestions);
-                callback(suggestions, status);
-            });
+        key: "getServiceAdapter",
+        value: function getServiceAdapter() {
+            return this.serviceAdapter || null;
         }
     }]);
 
     return PlacesBloodhoundEngine;
-}(_typeahead.Bloodhound);
+}(_bloodhound2.default);
 
 exports.default = PlacesBloodhoundEngine;

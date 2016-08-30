@@ -1,5 +1,7 @@
 import { Model } from 'backbone';
 
+import PlacesAdapter from '../vendor/PlacesAdapter';
+
 export default class AbstractServiceContainer extends Model {
     constructor( { StoreCollectionFactory, StoreModelFactory }, { url, normalizeRequestData, parseResponse } ) {
         var classProps = {
@@ -26,6 +28,8 @@ export default class AbstractServiceContainer extends Model {
     initialize( classProps, { StoreCollectionFactory, StoreModelFactory }, { url, normalizeRequestData, parseResponse } ) {
         this.set( 'mapBounds', new google.maps.LatLngBounds() );
         this.set( 'geocoder', new google.maps.Geocoder() );
+
+        this.set( 'placesAdapter', new PlacesAdapter() );
 
         var stores = StoreCollectionFactory(
             {

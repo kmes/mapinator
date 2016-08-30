@@ -1,4 +1,4 @@
-import { Bloodhound } from "typeahead.js-browserify";
+import Bloodhound from "typeahead.js/dist/bloodhound";
 
 export default class PlacesBloodhoundEngine extends Bloodhound {
     constructor( options = {} ) {
@@ -13,47 +13,24 @@ export default class PlacesBloodhoundEngine extends Bloodhound {
             identify: (obj) => obj.id
         });
 
-        this.setPlaceService( options.placeService );
+        this.setServiceAdapter( options.serviceAdapter );
     }
     onSearch( query, callback = () => {} ) {
         var self = this;
 
-        this.searchPlace( query, function( suggestions, status ) {
+        this.getServiceAdapter().search( query, function( suggestions, status ) {
             self.add( suggestions );
-
-            //console.log('sug added', suggestions);
 
             callback( suggestions );
         });
-    }
-    setPlaceService( placeService) {
-        return this.placeService = placeService;
-    }
-    getPlaceService() {
-        return this.placeService || null;
-    }
-    searchPlace( query, callback = () => {} ) {
-        var self = this;
 
-        let placeService = this.getPlaceService();
-        if( !placeService ) {
-            callback( false );
-            return false;
-        }
-
-        placeService.getPlacePredictions(
-            {
-                input: query,
-                types: ['geocode'],
-                componentRestrictions: {
-                    country: 'it'
-                }
-            },
-            function( suggestions, status ) {
-                console.log('suggestions', suggestions);
-
-                callback( suggestions, status );
-            }
-        );
     }
+
+    setServiceAdapter( serviceAdapter ) {
+        return this.serviceAdapter = serviceAdapter;
+    }
+    getServiceAdapter() {
+        return this.serviceAdapter || null;
+    }
+
 }

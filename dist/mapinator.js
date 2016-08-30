@@ -1922,7 +1922,7 @@
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"jquery":2,"underscore":6}],2:[function(require,module,exports){
+},{"jquery":2,"underscore":5}],2:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v1.12.4
  * http://jquery.com/
@@ -12933,12 +12933,6 @@ return jQuery;
 }));
 
 },{}],3:[function(require,module,exports){
-module.exports = {
-    "Bloodhound": require("typeahead.js/dist/bloodhound.js"),
-    "loadjQueryPlugin": function() {require("typeahead.js");}
-};
-
-},{"typeahead.js":5,"typeahead.js/dist/bloodhound.js":4}],4:[function(require,module,exports){
 /*!
  * typeahead.js 0.11.1
  * https://github.com/twitter/typeahead.js
@@ -13857,7 +13851,7 @@ module.exports = {
     }();
     return Bloodhound;
 });
-},{"jquery":2}],5:[function(require,module,exports){
+},{"jquery":2}],4:[function(require,module,exports){
 /*!
  * typeahead.js 0.11.1
  * https://github.com/twitter/typeahead.js
@@ -16309,7 +16303,7 @@ module.exports = {
         }
     })();
 });
-},{"jquery":2}],6:[function(require,module,exports){
+},{"jquery":2}],5:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -17859,7 +17853,7 @@ module.exports = {
   }
 }.call(this));
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -17906,7 +17900,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var $ = window.jQuery = window.$ = _jquery2.default;
+var $ = window ? window.jQuery || window.$ || (window.jQuery = _jquery2.default) : _jquery2.default;
 
 var Mapinator = function () {
     function Mapinator(config) {
@@ -17916,12 +17910,41 @@ var Mapinator = function () {
 
         this.serviceContainer = this.createServiceContainer(config);
         this.serviceContainer.set('jQuery', $);
-        this.bindServiceContainer(this.serviceContainer);
+        //this.bindServiceContainer( this.serviceContainer );
 
         this.addressView = this.createAddressView(config, this.serviceContainer);
+
+        this.mapView = this.createMapView(config, this.serviceContainer);
+
+        this.bindEvents();
     }
 
     _createClass(Mapinator, [{
+        key: 'bindEvents',
+        value: function bindEvents() {
+            var serviceContainer = this.serviceContainer;
+
+            serviceContainer.on('change:mapLocation', function (serviceContainer, mapLocation) {
+                var easyMap = serviceContainer.get('easyMap');
+                easyMap.setCenter(mapLocation.lat, mapLocation.lng);
+                easyMap.setZoom(10);
+            });
+            serviceContainer.listenToOnce(serviceContainer.get('stores'), 'sync', function (stores) {
+                serviceContainer.get('easyMap').fitCenterZoomToMarkers();
+
+                this.listenTo(this.get('stores'), 'sync', function (stores) {
+                    this.fitMapToNearestMarkers(2);
+                });
+            });
+
+            this.addressView.$el.bind('address:select', function (evt, result) {
+                serviceContainer.setLocation({
+                    lat: result.lat,
+                    lng: result.lng
+                });
+            });
+        }
+    }, {
         key: 'createServiceContainer',
         value: function createServiceContainer(_ref) {
             var storesUrl = _ref.storesUrl;
@@ -18064,7 +18087,7 @@ var Mapinator = function () {
 
 exports.default = Mapinator;
 
-},{"./helper/helper":8,"./models/AbstractServiceContainer":9,"./models/StoreCollectionFactory":10,"./models/StoreModelFactory":11,"./vendor/EasyMaps.js":12,"./views/AddressViewFactory":16,"./views/MapViewFactory":17,"jquery":2}],8:[function(require,module,exports){
+},{"./helper/helper":7,"./models/AbstractServiceContainer":8,"./models/StoreCollectionFactory":9,"./models/StoreModelFactory":10,"./vendor/EasyMaps.js":11,"./views/AddressViewFactory":16,"./views/MapViewFactory":17,"jquery":2}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18075,7 +18098,7 @@ function sanitizePhone(phone) {
     return phone;
 }
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18087,6 +18110,12 @@ var _createClass = function () { function defineProperties(target, props) { for 
 exports.AbstractServiceContainerClassFactory = AbstractServiceContainerClassFactory;
 
 var _backbone = require('backbone');
+
+var _PlacesAdapter = require('../vendor/PlacesAdapter');
+
+var _PlacesAdapter2 = _interopRequireDefault(_PlacesAdapter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -18138,6 +18167,8 @@ var AbstractServiceContainer = function (_Model) {
 
             this.set('mapBounds', new google.maps.LatLngBounds());
             this.set('geocoder', new google.maps.Geocoder());
+
+            this.set('placesAdapter', new _PlacesAdapter2.default());
 
             var stores = StoreCollectionFactory({
                 //url,
@@ -18216,7 +18247,7 @@ function AbstractServiceContainerClassFactory() {
     return AbstractServiceContainer;
 }
 
-},{"backbone":1}],10:[function(require,module,exports){
+},{"../vendor/PlacesAdapter":12,"backbone":1}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18256,7 +18287,7 @@ var storeCollection = {
 
 exports.default = (0, _backboneFactory2.default)(storeCollection, _backbone.Collection);
 
-},{"../vendor/backboneFactory":14,"backbone":1}],11:[function(require,module,exports){
+},{"../vendor/backboneFactory":14,"backbone":1}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18279,7 +18310,7 @@ var storeModel = {
 
 exports.default = (0, _backboneFactory2.default)(storeModel, _backbone.Model);
 
-},{"../vendor/backboneFactory":14,"backbone":1}],12:[function(require,module,exports){
+},{"../vendor/backboneFactory":14,"backbone":1}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18424,8 +18455,7 @@ EasyMaps.prototype.resetBounds = function () {
 };
 
 EasyMaps.prototype.setDomElem = function (elem) {
-
-    return this.domElem = document.querySelector(elem);
+    return this.domElem = elem instanceof HTMLElement ? elem : document.querySelector(elem);
 };
 
 EasyMaps.prototype.getCenter = function () {
@@ -18945,8 +18975,92 @@ EasyMaps.prototype.autocomplete = function (domElement, fnCallback) {
 
 exports.default = EasyMaps;
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var PlacesAdapter = function () {
+    function PlacesAdapter() {
+        _classCallCheck(this, PlacesAdapter);
+
+        this.placeService = new google.maps.places.AutocompleteService();
+        this.geocoder = new google.maps.Geocoder();
+    }
+
+    _createClass(PlacesAdapter, [{
+        key: 'search',
+        value: function search(query) {
+            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+
+            this.placeService.getPlacePredictions({
+                input: query,
+                types: ['geocode'],
+                componentRestrictions: {
+                    country: 'it'
+                }
+            }, function (suggestions, status) {
+                //console.log('suggestions', suggestions);
+
+                callback(suggestions, status);
+            });
+        }
+        /*search( query, callback = () => {} ) {
+            this.geocoder.geocode(
+                {
+                    address: query,
+                    componentRestrictions: {
+                        country: 'it'
+                    }
+                },
+                function( results, status ) {
+                    if( status !== 'OK' || !results.length ) {
+                        callback( false );
+                        return false;
+                    }
+                     var normalizedResults = results.map(function( result ) {
+                        return {
+                            ...result,
+                            id: result['place_id'],
+                            description: result['formatted_address'],
+                            lat: result.geometry.location.lat(),
+                            lng: result.geometry.location.lng()
+                        };
+                    });
+                     callback( normalizedResults );
+                }
+            );
+        }*/
+
+    }, {
+        key: 'fetchLatLng',
+        value: function fetchLatLng(options) {
+            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+
+            this.geocoder.geocode(options, function (results, status) {
+                if (status !== 'OK' || !results.length) {
+                    callback(false);
+                    return false;
+                }
+
+                callback(results.shift());
+            });
+        }
+    }]);
+
+    return PlacesAdapter;
+}();
+
+exports.default = PlacesAdapter;
+
+},{}],13:[function(require,module,exports){
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -18956,7 +19070,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _typeahead = require('typeahead.js-browserify');
+var _bloodhound = require("typeahead.js/dist/bloodhound");
+
+var _bloodhound2 = _interopRequireDefault(_bloodhound);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -18974,79 +19092,53 @@ var PlacesBloodhoundEngine = function (_Bloodhound) {
 
         var _this = _possibleConstructorReturn(this, (PlacesBloodhoundEngine.__proto__ || Object.getPrototypeOf(PlacesBloodhoundEngine)).call(this, _extends({}, options, {
             datumTokenizer: function datumTokenizer(obj) {
-                return _typeahead.Bloodhound.tokenizers.whitespace(obj.description);
+                return _bloodhound2.default.tokenizers.whitespace(obj.description);
             },
             queryTokenizer: function queryTokenizer(query) {
                 _this.onSearch(query);
 
-                return _typeahead.Bloodhound.tokenizers.whitespace(query);
+                return _bloodhound2.default.tokenizers.whitespace(query);
             },
             identify: function identify(obj) {
                 return obj.id;
             }
         })));
 
-        _this.setPlaceService(options.placeService);
+        _this.setServiceAdapter(options.serviceAdapter);
         return _this;
     }
 
     _createClass(PlacesBloodhoundEngine, [{
-        key: 'onSearch',
+        key: "onSearch",
         value: function onSearch(query) {
             var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 
             var self = this;
 
-            this.searchPlace(query, function (suggestions, status) {
+            this.getServiceAdapter().search(query, function (suggestions, status) {
                 self.add(suggestions);
-
-                //console.log('sug added', suggestions);
 
                 callback(suggestions);
             });
         }
     }, {
-        key: 'setPlaceService',
-        value: function setPlaceService(placeService) {
-            return this.placeService = placeService;
+        key: "setServiceAdapter",
+        value: function setServiceAdapter(serviceAdapter) {
+            return this.serviceAdapter = serviceAdapter;
         }
     }, {
-        key: 'getPlaceService',
-        value: function getPlaceService() {
-            return this.placeService || null;
-        }
-    }, {
-        key: 'searchPlace',
-        value: function searchPlace(query) {
-            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
-
-            var self = this;
-
-            var placeService = this.getPlaceService();
-            if (!placeService) {
-                callback(false);
-                return false;
-            }
-
-            placeService.getPlacePredictions({
-                input: query,
-                types: ['(cities)'],
-                componentRestrictions: {
-                    country: 'it'
-                }
-            }, function (suggestions, status) {
-                console.log('suggestions', suggestions);
-                callback(suggestions, status);
-            });
+        key: "getServiceAdapter",
+        value: function getServiceAdapter() {
+            return this.serviceAdapter || null;
         }
     }]);
 
     return PlacesBloodhoundEngine;
-}(_typeahead.Bloodhound);
+}(_bloodhound2.default);
 
 exports.default = PlacesBloodhoundEngine;
 
-},{"typeahead.js-browserify":3}],14:[function(require,module,exports){
+},{"typeahead.js/dist/bloodhound":3}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19081,85 +19173,37 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.default = typeaheadFactory;
+function typeaheadFactory(selector) {
+    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-var _typeahead = require('typeahead.js-browserify');
+    require('typeahead.js');
 
-var _typeahead2 = _interopRequireDefault(_typeahead);
+    var $input = jQuery(selector);
 
-var _PlacesBloodhoundEngine = require('./PlacesBloodhoundEngine');
-
-var _PlacesBloodhoundEngine2 = _interopRequireDefault(_PlacesBloodhoundEngine);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function typeaheadFactory(window, selector, datasets) {
-    //require('typeahead.js/dist/typeahead.bundle.js');
-
-    /*var placesSource = new Bloodhound({
-        //queryTokenizer: Bloodhound.tokenizers.whitespace,
-        //datumTokenizer: Bloodhound.tokenizers.whitespace,
-        queryTokenizer: (d) => Bloodhound.tokenizers.whitespace,
-        datumTokenizer: (d) => Bloodhound.tokenizers.whitespace(d.description),
-        //identify: (obj) => obj.description,
-        local: [
-            {
-                description: 'milano'
-            },
-            {
-                description: 'Milano'
-            }
-        ]
-    });*/
-
-    /*var placeService = new google.maps.places.AutocompleteService();
-     var placesSource = new Bloodhound({
-        datumTokenizer: (obj) => Bloodhound.tokenizers.whitespace(obj.description),
-        queryTokenizer: function(query) {
-            var engine = this;
-            placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
-                engine.add( suggestions );
-            });
-             return Bloodhound.tokenizers.whitespace( query );
-        },
-        local:
-        [
-            {
-                description: 'milano assago'
-            },
-            {
-                description: 'Milanoo'
-            }
-        ]
-    });*/
-
-    var placesSource = new _PlacesBloodhoundEngine2.default({
-        placeService: new google.maps.places.AutocompleteService()
-    });
-
-    return function (window, placesSource) {
-        console.log(typeof window === 'undefined' ? 'undefined' : _typeof(window));
-        _typeahead2.default.loadjQueryPlugin();
-
-        //return window.jQuery( selector ).typeahead( {}, datasets );
-
-        return window.jQuery(selector).typeahead({}, {
-            display: 'description',
-            source: placesSource
-        });
-    }.bind(window)(window, placesSource);
+    return $input.typeahead({}, _extends({
+        display: 'description'
+    }, options));
 }
 
-},{"./PlacesBloodhoundEngine":13,"typeahead.js-browserify":3}],16:[function(require,module,exports){
+},{"typeahead.js":4}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+//import PlacesAdapter from '../vendor/PlacesAdapter';
+
+
 var _backbone = require('backbone');
+
+var _PlacesBloodhoundEngine = require('../vendor/PlacesBloodhoundEngine');
+
+var _PlacesBloodhoundEngine2 = _interopRequireDefault(_PlacesBloodhoundEngine);
 
 var _typeaheadFactory = require('../vendor/typeaheadFactory');
 
@@ -19169,68 +19213,38 @@ var _backboneFactory = require('../vendor/backboneFactory');
 
 var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
 
-var _bloodhound = require('typeahead.js/dist/bloodhound.js');
-
-var _bloodhound2 = _interopRequireDefault(_bloodhound);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-//console.log('Bloodhound', Bloodhound);
 
 var addressView = {
     events: {
         'click': 'pickerHandler',
-        'keyup': 'pickerHandler'
+        'keyup': 'pickerHandler',
+        'typeahead:select': 'pickerHandler'
     },
     initialize: function initialize(options) {
         var view = this;
 
-        var placeService = new google.maps.places.AutocompleteService();
+        var serviceAdapter = options.serviceContainer.get('placesAdapter');
 
-        /*typeaheadFactory({
-            jQuery,
-            el: view.el,
-            options: null,
-            datasets: {
-                name: 'locations',
-                display: ( suggestion ) => suggestion.description,
-                async: true,
-                source: function( query, syncResults, asyncResults ) {
-                    placeService.getQueryPredictions({ input: query }, function(suggestions, status) {
-                        console.log('suggestions', suggestions.map((sug) => sug.description));
-                         asyncResults( suggestions );
-                    });
-                }
-            }
-        });*/
+        (0, _typeaheadFactory2.default)(view.el, {
+            source: new _PlacesBloodhoundEngine2.default({ serviceAdapter: serviceAdapter })
+        });
 
-        /*var sourcePlaces = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('description'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            identify: (obj) => obj.description,
-         });*/
+        view.$el.bind('typeahead:select', function (evt, result) {
+            serviceAdapter.fetchLatLng({ placeId: result['place_id'] }, function (result) {
+                if (!result) throw new Error('Error to fetch place position');
 
-        (0, _typeaheadFactory2.default)(window, view.el, {
-            name: 'places',
-            //display: 'description',
-            //async: true,
-            source: function source(query, sync) {
-                //window.ssync = sync;
-                placeService.getQueryPredictions({ input: query }, function (suggestions, status) {
-                    var sugList = suggestions.map(function (sug) {
-                        return sug.description;
-                    });
-
-                    console.log('suggestions', suggestions);
-                    console.log('sugList', sugList);
-
-                    sync(sugList);
-                });
-            }
+                view.$el.trigger('address:select', _extends({}, result, {
+                    lat: result.geometry.location.lat(),
+                    lng: result.geometry.location.lng()
+                }));
+            });
         });
     },
     pickerHandler: function pickerHandler(evt, result) {
         var view = this;
+        var input = view.el;
+        var $input = jQuery(input);
 
         switch (evt.type) {
             case 'keyup':
@@ -19239,11 +19253,11 @@ var addressView = {
                     break;
                 }
                 setTimeout(function () {
-                    $('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
+                    jQuery('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
                 }, 200);
                 break;
             case 'click':
-                view.el.setSelectionRange(0, view.el.value.length);
+                input.setSelectionRange(0, input.value.length);
                 break;
         }
     }
@@ -19251,7 +19265,7 @@ var addressView = {
 
 exports.default = (0, _backboneFactory2.default)(addressView, _backbone.View);
 
-},{"../vendor/backboneFactory":14,"../vendor/typeaheadFactory":15,"backbone":1,"typeahead.js/dist/bloodhound.js":4}],17:[function(require,module,exports){
+},{"../vendor/PlacesBloodhoundEngine":13,"../vendor/backboneFactory":14,"../vendor/typeaheadFactory":15,"backbone":1}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19277,11 +19291,10 @@ var mapView = {
 
         var jQuery = serviceContainer.get('jQuery');
 
-        var map = serviceContainer.get('map');
-
         var easyMap = new EasyMaps({
             jQuery: jQuery,
-            map: map,
+            //map: map,
+            elem: view.el,
             controls: {
                 'mapTypeControl': false,
                 'navigationControl': false,
@@ -19295,7 +19308,11 @@ var mapView = {
                 'draggable': true
             }
         });
+
+        var map = easyMap.mapObj;
+
         serviceContainer.set('easyMap', easyMap);
+        serviceContainer.set('map', map);
 
         map.addListener('bounds_changed', function () {
             window.clearTimeout(view._t);
@@ -19357,4 +19374,4 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 window.Mapinator = _Mapinator2.default;
 //window.AbstractServiceContainer = AbstractServiceContainer;
 
-},{"./class/Mapinator":7}]},{},[18]);
+},{"./class/Mapinator":6}]},{},[18]);

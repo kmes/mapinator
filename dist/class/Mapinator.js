@@ -44,7 +44,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var $ = window.jQuery = window.$ = _jquery2.default;
+var $ = window ? window.jQuery || window.$ || (window.jQuery = _jquery2.default) : _jquery2.default;
 
 var Mapinator = function () {
     function Mapinator(config) {
@@ -54,12 +54,41 @@ var Mapinator = function () {
 
         this.serviceContainer = this.createServiceContainer(config);
         this.serviceContainer.set('jQuery', $);
-        this.bindServiceContainer(this.serviceContainer);
+        //this.bindServiceContainer( this.serviceContainer );
 
         this.addressView = this.createAddressView(config, this.serviceContainer);
+
+        this.mapView = this.createMapView(config, this.serviceContainer);
+
+        this.bindEvents();
     }
 
     _createClass(Mapinator, [{
+        key: 'bindEvents',
+        value: function bindEvents() {
+            var serviceContainer = this.serviceContainer;
+
+            serviceContainer.on('change:mapLocation', function (serviceContainer, mapLocation) {
+                var easyMap = serviceContainer.get('easyMap');
+                easyMap.setCenter(mapLocation.lat, mapLocation.lng);
+                easyMap.setZoom(10);
+            });
+            serviceContainer.listenToOnce(serviceContainer.get('stores'), 'sync', function (stores) {
+                serviceContainer.get('easyMap').fitCenterZoomToMarkers();
+
+                this.listenTo(this.get('stores'), 'sync', function (stores) {
+                    this.fitMapToNearestMarkers(2);
+                });
+            });
+
+            this.addressView.$el.bind('address:select', function (evt, result) {
+                serviceContainer.setLocation({
+                    lat: result.lat,
+                    lng: result.lng
+                });
+            });
+        }
+    }, {
         key: 'createServiceContainer',
         value: function createServiceContainer(_ref) {
             var storesUrl = _ref.storesUrl;
