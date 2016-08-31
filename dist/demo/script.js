@@ -60,7 +60,10 @@ jQuery('.cancel-address').on('click', function( evt ) {
 
 
 var mapinator = new Mapinator({
-    storesUrl: '/stores.json',
+    storesUrl: function() {
+        console.log('url', this);
+        return '/stores.json';
+    },
     storesComparator: 'distance',
     parseResponse: function( response ) {
         return response.collections.map(function( data ) {
@@ -93,7 +96,7 @@ var mapinator = new Mapinator({
         'scrollwheel': false,
         'streetViewControl': false,
         'panControl': false,
-        'zoomControl': false,
+        'zoomControl': true,
         'scaleControl': true,
         'overviewMapControl': false,
         'disableDoubleClickZoom': false,
