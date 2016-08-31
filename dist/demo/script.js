@@ -43,7 +43,7 @@ var config = {
     storePanelContainer: null,
 
     storeMarkerIcon: '.marker-prototype .marker-store',
-    getStoreIconPath: function() {
+    iconPath: function() {
         return jQuery( this.storeMarkerIcon ).attr('src');
     },
 
@@ -51,7 +51,8 @@ var config = {
 
     serviceContainer: null,
 
-    storesUrl: '/ajax/store/list',
+    //storesUrl: 'http://www.maxizoo.local'+'/ajax/store/list',
+    storesUrl: '/stores.json',
 
     storesContainer: '.stores-container',
     storeProto: '.store-prototype > *',

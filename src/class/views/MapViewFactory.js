@@ -31,17 +31,21 @@ const mapView = {
         map.addListener('bounds_changed', function() {
             window.clearTimeout( view._t );
             view._t = window.setTimeout(function() {
-                serviceContainer.set('mapBounds', map.getBounds());
+                view.$el.trigger('map:bounds_changed', map.getBounds());
             }, 800);
         });
 
         this.listenTo(this.collection, 'sync', function( collection, resp, req ) {
-            view.refreshMap( collection, easyMap, markerIcon, infoWindow );
+            view.refreshMap({ collection, easyMap, iconPath: markerIcon, infoWindowCreator: infoWindow });
         });
     },
 
-    refreshMap: function( collection, easyMap, iconPath, infoWindowCreator ) {
-        easyMap.removeAllMarker();
+    refreshMap: function({ collection, easyMap, iconPath, infoWindowCreator }) {
+        this.removeAllMarkers( easyMap );
+        this.loadMarkers({ collection, easyMap, iconPath, infoWindowCreator });
+    },
+
+    loadMarkers: function({ collection, easyMap, iconPath, infoWindowCreator })  {
         for( var n in collection.models ) {
             var model = collection.models[ n ];
 
@@ -69,6 +73,10 @@ const mapView = {
 
         //todo: togliere?
         //easyMap.fitCenterZoomToMarkers();
+    },
+
+    removeAllMarkers: function( easyMap ) {
+        easyMap.removeAllMarker();
     }
 };
 

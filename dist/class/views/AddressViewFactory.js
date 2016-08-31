@@ -62,6 +62,15 @@ var addressView = {
                 view.$el.trigger('address:select', result);
             });
         });
+
+        if (typeof options.cancelAddressButton === 'string' || options.cancelAddressButton instanceof HTMLElement) {
+            jQuery(options.cancelAddressButton).bind('click', function (evt) {
+                console.log('click');
+
+                view.el.value = '';
+                view.el.focus();
+            });
+        }
     },
     pickerHandler: function pickerHandler(evt, result) {
         var view = this;

@@ -51,6 +51,15 @@ const addressView = {
 
         });
 
+        if( typeof options.cancelAddressButton === 'string' || options.cancelAddressButton instanceof HTMLElement ) {
+            jQuery( options.cancelAddressButton ).bind('click', function( evt ) {
+                console.log('click');
+
+                view.el.value = '';
+                view.el.focus();
+            });
+        }
+
     },
     pickerHandler: function( evt, result ) {
         var view = this;

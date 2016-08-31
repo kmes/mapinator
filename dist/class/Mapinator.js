@@ -18,9 +18,9 @@ var _AbstractServiceContainer = require('./models/AbstractServiceContainer');
 
 var _AbstractServiceContainer2 = _interopRequireDefault(_AbstractServiceContainer);
 
-var _StoreModelFactory = require('./models/StoreModelFactory');
+var _StoreModelClassFactory = require('./models/StoreModelClassFactory');
 
-var _StoreModelFactory2 = _interopRequireDefault(_StoreModelFactory);
+var _StoreModelClassFactory2 = _interopRequireDefault(_StoreModelClassFactory);
 
 var _StoreCollectionFactory = require('./models/StoreCollectionFactory');
 
@@ -67,35 +67,74 @@ var Mapinator = function () {
         });
 
         this.bindEvents();
+
+        this.refreshStores(config.mapLocation);
     }
 
     _createClass(Mapinator, [{
+        key: 'refreshStores',
+        value: function refreshStores(location) {
+            var _this2 = this;
+
+            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+
+            this.showLoading();
+
+            return this.serviceContainer.get('stores').fetchStores(location, function (stores) {
+                callback(stores);
+
+                _this2.hideLoading();
+            });
+        }
+    }, {
+        key: 'showLoading',
+        value: function showLoading() {
+            var _config$startLoading = this.config.startLoading;
+            var startLoading = _config$startLoading === undefined ? function () {} : _config$startLoading;
+
+
+            startLoading();
+        }
+    }, {
+        key: 'hideLoading',
+        value: function hideLoading() {
+            var _config$endLoading = this.config.endLoading;
+            var endLoading = _config$endLoading === undefined ? function () {} : _config$endLoading;
+
+
+            endLoading();
+        }
+    }, {
         key: 'bindEvents',
         value: function bindEvents() {
             var serviceContainer = this.serviceContainer;
 
-            serviceContainer.on('change:mapLocation', function (serviceContainer, mapLocation) {
-                //console.log('new mapLocation', mapLocation);
-
-                var easyMap = serviceContainer.get('easyMap');
-                easyMap.setCenter(mapLocation.lat, mapLocation.lng);
-                //easyMap.setZoom(10);
-            });
             serviceContainer.listenToOnce(serviceContainer.get('stores'), 'sync', function (stores) {
                 serviceContainer.get('easyMap').fitCenterZoomToMarkers();
 
                 this.listenTo(this.get('stores'), 'sync', function (stores) {
+                    //map load markers in mapView sync to storeCollection
                     this.fitMapToNearestMarkers(2);
                 });
             });
 
             this.addressView.$el.bind('address:select', function (evt, result) {
-                //console.log('address:select', result);
-
                 serviceContainer.setLocation({
                     lat: result.lat,
                     lng: result.lng
                 });
+            });
+
+            this.mapView.$el.bind('map:bounds_changed', function (evt, bounds) {
+                serviceContainer.set('mapBounds', bounds);
+
+                console.log('new bounds', bounds);
+            });
+
+            serviceContainer.on('change:mapLocation', function (serviceContainer, mapLocation) {
+                var easyMap = serviceContainer.get('easyMap');
+                easyMap.setCenter(mapLocation.lat, mapLocation.lng);
+                //easyMap.setZoom(10);
             });
         }
     }, {
@@ -103,7 +142,6 @@ var Mapinator = function () {
         value: function createServiceContainer(_ref) {
             var storesUrl = _ref.storesUrl;
 
-            //var { storesUrl } = config;
             var ServiceContainer = _AbstractServiceContainer2.default.extend({
                 comparator: 'distance',
                 getLocation: function getLocation() {
@@ -145,7 +183,7 @@ var Mapinator = function () {
 
             return new ServiceContainer({
                 StoreCollectionFactory: _StoreCollectionFactory2.default,
-                StoreModelFactory: _StoreModelFactory2.default
+                StoreModelClassFactory: _StoreModelClassFactory2.default
             }, {
                 url: storesUrl,
                 normalizeRequestData: function normalizeRequestData(requestData) {
@@ -193,7 +231,7 @@ var Mapinator = function () {
         value: function createAddressView(config, serviceContainer) {
             return (0, _AddressViewFactory2.default)({}, {
                 el: config.addressSelector,
-                cancelAddressSelector: '.cancel-address',
+                cancelAddressButton: '.cancel-address',
                 serviceContainer: serviceContainer,
                 /*mapSelector: config.mapSelector,
                 mapLocation: config.mapLocation,
@@ -226,7 +264,7 @@ var Mapinator = function () {
                     'disableDoubleClickZoom': false,
                     'draggable': true
                 },
-                markerIcon: config.getStoreIconPath(),
+                markerIcon: typeof config.iconPath === 'function' ? config.iconPath() : config.iconPath,
                 infoWindow: function infoWindow(data) {
                     if (!data) return false;
 
@@ -237,7 +275,7 @@ var Mapinator = function () {
                     $info.find('.title').html(data.title);
                     $info.find('.street').html(data.street);
 
-                    var phone = data.phone.trim() ? $info.find('.phone').html() + data.phone : '';
+                    var phone = data.phone && data.phone.trim() ? $info.find('.phone').html() + data.phone : '';
                     $info.find('.phone').html(phone);
 
                     var href = $info.find('.link-hours').attr('href');

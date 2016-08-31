@@ -17874,9 +17874,9 @@ var _AbstractServiceContainer = require('./models/AbstractServiceContainer');
 
 var _AbstractServiceContainer2 = _interopRequireDefault(_AbstractServiceContainer);
 
-var _StoreModelFactory = require('./models/StoreModelFactory');
+var _StoreModelClassFactory = require('./models/StoreModelClassFactory');
 
-var _StoreModelFactory2 = _interopRequireDefault(_StoreModelFactory);
+var _StoreModelClassFactory2 = _interopRequireDefault(_StoreModelClassFactory);
 
 var _StoreCollectionFactory = require('./models/StoreCollectionFactory');
 
@@ -17923,35 +17923,74 @@ var Mapinator = function () {
         });
 
         this.bindEvents();
+
+        this.refreshStores(config.mapLocation);
     }
 
     _createClass(Mapinator, [{
+        key: 'refreshStores',
+        value: function refreshStores(location) {
+            var _this2 = this;
+
+            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+
+            this.showLoading();
+
+            return this.serviceContainer.get('stores').fetchStores(location, function (stores) {
+                callback(stores);
+
+                _this2.hideLoading();
+            });
+        }
+    }, {
+        key: 'showLoading',
+        value: function showLoading() {
+            var _config$startLoading = this.config.startLoading;
+            var startLoading = _config$startLoading === undefined ? function () {} : _config$startLoading;
+
+
+            startLoading();
+        }
+    }, {
+        key: 'hideLoading',
+        value: function hideLoading() {
+            var _config$endLoading = this.config.endLoading;
+            var endLoading = _config$endLoading === undefined ? function () {} : _config$endLoading;
+
+
+            endLoading();
+        }
+    }, {
         key: 'bindEvents',
         value: function bindEvents() {
             var serviceContainer = this.serviceContainer;
 
-            serviceContainer.on('change:mapLocation', function (serviceContainer, mapLocation) {
-                //console.log('new mapLocation', mapLocation);
-
-                var easyMap = serviceContainer.get('easyMap');
-                easyMap.setCenter(mapLocation.lat, mapLocation.lng);
-                //easyMap.setZoom(10);
-            });
             serviceContainer.listenToOnce(serviceContainer.get('stores'), 'sync', function (stores) {
                 serviceContainer.get('easyMap').fitCenterZoomToMarkers();
 
                 this.listenTo(this.get('stores'), 'sync', function (stores) {
+                    //map load markers in mapView sync to storeCollection
                     this.fitMapToNearestMarkers(2);
                 });
             });
 
             this.addressView.$el.bind('address:select', function (evt, result) {
-                //console.log('address:select', result);
-
                 serviceContainer.setLocation({
                     lat: result.lat,
                     lng: result.lng
                 });
+            });
+
+            this.mapView.$el.bind('map:bounds_changed', function (evt, bounds) {
+                serviceContainer.set('mapBounds', bounds);
+
+                console.log('new bounds', bounds);
+            });
+
+            serviceContainer.on('change:mapLocation', function (serviceContainer, mapLocation) {
+                var easyMap = serviceContainer.get('easyMap');
+                easyMap.setCenter(mapLocation.lat, mapLocation.lng);
+                //easyMap.setZoom(10);
             });
         }
     }, {
@@ -17959,7 +17998,6 @@ var Mapinator = function () {
         value: function createServiceContainer(_ref) {
             var storesUrl = _ref.storesUrl;
 
-            //var { storesUrl } = config;
             var ServiceContainer = _AbstractServiceContainer2.default.extend({
                 comparator: 'distance',
                 getLocation: function getLocation() {
@@ -18001,7 +18039,7 @@ var Mapinator = function () {
 
             return new ServiceContainer({
                 StoreCollectionFactory: _StoreCollectionFactory2.default,
-                StoreModelFactory: _StoreModelFactory2.default
+                StoreModelClassFactory: _StoreModelClassFactory2.default
             }, {
                 url: storesUrl,
                 normalizeRequestData: function normalizeRequestData(requestData) {
@@ -18049,7 +18087,7 @@ var Mapinator = function () {
         value: function createAddressView(config, serviceContainer) {
             return (0, _AddressViewFactory2.default)({}, {
                 el: config.addressSelector,
-                cancelAddressSelector: '.cancel-address',
+                cancelAddressButton: '.cancel-address',
                 serviceContainer: serviceContainer,
                 /*mapSelector: config.mapSelector,
                 mapLocation: config.mapLocation,
@@ -18082,7 +18120,7 @@ var Mapinator = function () {
                     'disableDoubleClickZoom': false,
                     'draggable': true
                 },
-                markerIcon: config.getStoreIconPath(),
+                markerIcon: typeof config.iconPath === 'function' ? config.iconPath() : config.iconPath,
                 infoWindow: function infoWindow(data) {
                     if (!data) return false;
 
@@ -18093,7 +18131,7 @@ var Mapinator = function () {
                     $info.find('.title').html(data.title);
                     $info.find('.street').html(data.street);
 
-                    var phone = data.phone.trim() ? $info.find('.phone').html() + data.phone : '';
+                    var phone = data.phone && data.phone.trim() ? $info.find('.phone').html() + data.phone : '';
                     $info.find('.phone').html(phone);
 
                     var href = $info.find('.link-hours').attr('href');
@@ -18111,7 +18149,7 @@ var Mapinator = function () {
 
 exports.default = Mapinator;
 
-},{"./helper/helper":7,"./models/AbstractServiceContainer":8,"./models/StoreCollectionFactory":9,"./models/StoreModelFactory":10,"./vendor/EasyMaps.js":11,"./views/AddressViewFactory":16,"./views/MapViewFactory":17,"jquery":2}],7:[function(require,module,exports){
+},{"./helper/helper":7,"./models/AbstractServiceContainer":8,"./models/StoreCollectionFactory":9,"./models/StoreModelClassFactory":10,"./vendor/EasyMaps.js":11,"./views/AddressViewFactory":17,"./views/MapViewFactory":18,"jquery":2}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18152,7 +18190,7 @@ var AbstractServiceContainer = function (_Model) {
 
     function AbstractServiceContainer(_ref, _ref2) {
         var StoreCollectionFactory = _ref.StoreCollectionFactory;
-        var StoreModelFactory = _ref.StoreModelFactory;
+        var StoreModelClassFactory = _ref.StoreModelClassFactory;
         var url = _ref2.url;
         var normalizeRequestData = _ref2.normalizeRequestData;
         var parseResponse = _ref2.parseResponse;
@@ -18177,14 +18215,14 @@ var AbstractServiceContainer = function (_Model) {
                 }
             }
         };
-        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelFactory: StoreModelFactory }, { url: url, normalizeRequestData: normalizeRequestData, parseResponse: parseResponse }));
+        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelClassFactory: StoreModelClassFactory }, { url: url, normalizeRequestData: normalizeRequestData, parseResponse: parseResponse }));
     }
 
     _createClass(AbstractServiceContainer, [{
         key: 'initialize',
         value: function initialize(classProps, _ref3, _ref4) {
             var StoreCollectionFactory = _ref3.StoreCollectionFactory;
-            var StoreModelFactory = _ref3.StoreModelFactory;
+            var StoreModelClassFactory = _ref3.StoreModelClassFactory;
             var url = _ref4.url;
             var normalizeRequestData = _ref4.normalizeRequestData;
             var parseResponse = _ref4.parseResponse;
@@ -18195,11 +18233,10 @@ var AbstractServiceContainer = function (_Model) {
             this.set('placesAdapter', new _PlacesAdapter2.default());
 
             var stores = StoreCollectionFactory({
-                //url,
-                url: 'http://www.maxizoo.local' + url,
+                url: url,
                 parse: parseResponse
             }, null, {
-                model: StoreModelFactory
+                model: StoreModelClassFactory()
             });
 
             this.set('stores', stores);
@@ -18291,13 +18328,15 @@ var storeCollection = {
         console.log('initialize', arguments);
     },*/
 
-    fetchStores: function fetchStores(location) {
+    fetchStores: function fetchStores(_ref) {
+        var lat = _ref.lat;
+        var lng = _ref.lng;
         var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 
         return this.fetch({
             data: {
-                lat: location.lat,
-                lng: location.lng
+                lat: lat,
+                lng: lng
             },
             success: function success(data) {
                 callback(data);
@@ -18311,7 +18350,7 @@ var storeCollection = {
 
 exports.default = (0, _backboneFactory2.default)(storeCollection, _backbone.Collection);
 
-},{"../vendor/backboneFactory":14,"backbone":1}],10:[function(require,module,exports){
+},{"../vendor/backboneFactory":15,"backbone":1}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18320,9 +18359,9 @@ Object.defineProperty(exports, "__esModule", {
 
 var _backbone = require('backbone');
 
-var _backboneFactory = require('../vendor/backboneFactory');
+var _backboneClassFactory = require('../vendor/backboneClassFactory');
 
-var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
+var _backboneClassFactory2 = _interopRequireDefault(_backboneClassFactory);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18332,9 +18371,9 @@ var storeModel = {
    }*/
 };
 
-exports.default = (0, _backboneFactory2.default)(storeModel, _backbone.Model);
+exports.default = (0, _backboneClassFactory2.default)(storeModel, _backbone.Model);
 
-},{"../vendor/backboneFactory":14,"backbone":1}],11:[function(require,module,exports){
+},{"../vendor/backboneClassFactory":14,"backbone":1}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19168,15 +19207,30 @@ exports.default = PlacesBloodhoundEngine;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+function backboneClassFactory(customObj, BackboneClass) {
+
+    return function () {
+        var classProps = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        return BackboneClass.extend(Object.assign({}, customObj, classProps));
+    };
+}
+
+exports.default = backboneClassFactory;
+
+},{}],15:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _backboneClassFactory = require('./backboneClassFactory');
+
+var _backboneClassFactory2 = _interopRequireDefault(_backboneClassFactory);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function backboneFactory(customObj, BackboneClass) {
-    /*console.log( 'customObj', customObj );
-     return function( classProps = {}, ...args ) {
-        var proto = Object.assign({}, customObj, classProps);
-         console.log('proto', proto);
-         var NewClass = BackboneClass.extend( proto );
-         console.log('NewClass', NewClass);
-         return new NewClass( ...args );
-    };*/
 
     return function () {
         for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
@@ -19186,11 +19240,14 @@ function backboneFactory(customObj, BackboneClass) {
         var classProps = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
         return new (Function.prototype.bind.apply(BackboneClass.extend(Object.assign({}, customObj, classProps)), [null].concat(args)))();
     };
+
+    /*return ( classProps = {}, ...args ) =>
+        new (backboneClassFactory( customObj, BackboneClass ))( ...args )*/
 }
 
 exports.default = backboneFactory;
 
-},{}],15:[function(require,module,exports){
+},{"./backboneClassFactory":14}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19212,7 +19269,7 @@ function typeaheadFactory(selector) {
     }, options));
 }
 
-},{"typeahead.js":4}],16:[function(require,module,exports){
+},{"typeahead.js":4}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19277,6 +19334,15 @@ var addressView = {
                 view.$el.trigger('address:select', result);
             });
         });
+
+        if (typeof options.cancelAddressButton === 'string' || options.cancelAddressButton instanceof HTMLElement) {
+            jQuery(options.cancelAddressButton).bind('click', function (evt) {
+                console.log('click');
+
+                view.el.value = '';
+                view.el.focus();
+            });
+        }
     },
     pickerHandler: function pickerHandler(evt, result) {
         var view = this;
@@ -19308,7 +19374,7 @@ var addressView = {
 
 exports.default = (0, _backboneFactory2.default)(addressView, _backbone.View);
 
-},{"../vendor/PlacesBloodhoundEngine":13,"../vendor/backboneFactory":14,"../vendor/typeaheadFactory":15,"backbone":1}],17:[function(require,module,exports){
+},{"../vendor/PlacesBloodhoundEngine":13,"../vendor/backboneFactory":15,"../vendor/typeaheadFactory":16,"backbone":1}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19360,17 +19426,32 @@ var mapView = {
         map.addListener('bounds_changed', function () {
             window.clearTimeout(view._t);
             view._t = window.setTimeout(function () {
-                serviceContainer.set('mapBounds', map.getBounds());
+                //serviceContainer.set('mapBounds', map.getBounds());
+                view.$el.trigger('map:bounds_changed', map.getBounds());
             }, 800);
         });
 
         this.listenTo(this.collection, 'sync', function (collection, resp, req) {
-            view.refreshMap(collection, easyMap, markerIcon, infoWindow);
+            view.refreshMap({ collection: collection, easyMap: easyMap, iconPath: markerIcon, infoWindowCreator: infoWindow });
         });
     },
 
-    refreshMap: function refreshMap(collection, easyMap, iconPath, infoWindowCreator) {
-        easyMap.removeAllMarker();
+    refreshMap: function refreshMap(_ref2) {
+        var collection = _ref2.collection;
+        var easyMap = _ref2.easyMap;
+        var iconPath = _ref2.iconPath;
+        var infoWindowCreator = _ref2.infoWindowCreator;
+
+        this.removeAllMarkers(easyMap);
+        this.loadMarkers({ collection: collection, easyMap: easyMap, iconPath: iconPath, infoWindowCreator: infoWindowCreator });
+    },
+
+    loadMarkers: function loadMarkers(_ref3) {
+        var collection = _ref3.collection;
+        var easyMap = _ref3.easyMap;
+        var iconPath = _ref3.iconPath;
+        var infoWindowCreator = _ref3.infoWindowCreator;
+
         for (var n in collection.models) {
             var model = collection.models[n];
 
@@ -19398,12 +19479,16 @@ var mapView = {
 
         //todo: togliere?
         //easyMap.fitCenterZoomToMarkers();
+    },
+
+    removeAllMarkers: function removeAllMarkers(easyMap) {
+        easyMap.removeAllMarker();
     }
 };
 
 exports.default = (0, _backboneFactory2.default)(mapView, _backbone.View);
 
-},{"../vendor/backboneFactory":14,"backbone":1}],18:[function(require,module,exports){
+},{"../vendor/backboneFactory":15,"backbone":1}],19:[function(require,module,exports){
 'use strict';
 
 var _Mapinator = require('./class/Mapinator');
@@ -19417,4 +19502,4 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 window.Mapinator = _Mapinator2.default;
 //window.AbstractServiceContainer = AbstractServiceContainer;
 
-},{"./class/Mapinator":6}]},{},[18]);
+},{"./class/Mapinator":6}]},{},[19]);

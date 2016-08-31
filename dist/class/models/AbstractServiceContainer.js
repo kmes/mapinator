@@ -27,7 +27,7 @@ var AbstractServiceContainer = function (_Model) {
 
     function AbstractServiceContainer(_ref, _ref2) {
         var StoreCollectionFactory = _ref.StoreCollectionFactory;
-        var StoreModelFactory = _ref.StoreModelFactory;
+        var StoreModelClassFactory = _ref.StoreModelClassFactory;
         var url = _ref2.url;
         var normalizeRequestData = _ref2.normalizeRequestData;
         var parseResponse = _ref2.parseResponse;
@@ -52,14 +52,14 @@ var AbstractServiceContainer = function (_Model) {
                 }
             }
         };
-        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelFactory: StoreModelFactory }, { url: url, normalizeRequestData: normalizeRequestData, parseResponse: parseResponse }));
+        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelClassFactory: StoreModelClassFactory }, { url: url, normalizeRequestData: normalizeRequestData, parseResponse: parseResponse }));
     }
 
     _createClass(AbstractServiceContainer, [{
         key: 'initialize',
         value: function initialize(classProps, _ref3, _ref4) {
             var StoreCollectionFactory = _ref3.StoreCollectionFactory;
-            var StoreModelFactory = _ref3.StoreModelFactory;
+            var StoreModelClassFactory = _ref3.StoreModelClassFactory;
             var url = _ref4.url;
             var normalizeRequestData = _ref4.normalizeRequestData;
             var parseResponse = _ref4.parseResponse;
@@ -70,11 +70,10 @@ var AbstractServiceContainer = function (_Model) {
             this.set('placesAdapter', new _PlacesAdapter2.default());
 
             var stores = StoreCollectionFactory({
-                //url,
-                url: 'http://www.maxizoo.local' + url,
+                url: url,
                 parse: parseResponse
             }, null, {
-                model: StoreModelFactory
+                model: StoreModelClassFactory()
             });
 
             this.set('stores', stores);

@@ -7,11 +7,11 @@ const storeCollection =  {
         console.log('initialize', arguments);
     },*/
 
-    fetchStores: function( location, callback = () => {} ) {
+    fetchStores: function( {lat, lng}, callback = () => {} ) {
         return this.fetch({
             data: {
-                lat: location.lat,
-                lng: location.lng
+                lat,
+                lng
             },
             success: function( data ) {
                 callback( data );

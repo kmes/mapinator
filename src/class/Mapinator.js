@@ -6,7 +6,7 @@ import EasyMaps from './vendor/EasyMaps.js';
 
 import AbstractServiceContainer from './models/AbstractServiceContainer';
 
-import StoreModelFactory from './models/StoreModelFactory';
+import StoreModelClassFactory from './models/StoreModelClassFactory';
 import StoreCollectionFactory from './models/StoreCollectionFactory';
 import AddressViewFactory from './views/AddressViewFactory';
 import MapViewFactory from './views/MapViewFactory';
@@ -30,38 +30,63 @@ export default class Mapinator {
         });
 
         this.bindEvents();
+
+        this.refreshStores( config.mapLocation );
+    }
+
+    refreshStores( location, callback = () => {} ) {
+        this.showLoading();
+
+        return this.serviceContainer.get('stores').fetchStores( location, ( stores ) => {
+            callback( stores );
+
+            this.hideLoading();
+        });
+    }
+    showLoading() {
+        var { startLoading = () => {} } = this.config;
+
+        startLoading();
+    }
+    hideLoading() {
+        var { endLoading = () => {} } = this.config;
+
+        endLoading();
     }
 
     bindEvents() {
         var serviceContainer = this.serviceContainer;
 
-        serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
-            //console.log('new mapLocation', mapLocation);
-
-            var easyMap = serviceContainer.get('easyMap');
-            easyMap.setCenter(mapLocation.lat, mapLocation.lng);
-            //easyMap.setZoom(10);
-        });
         serviceContainer.listenToOnce( serviceContainer.get('stores'), 'sync', function( stores ) {
             serviceContainer.get('easyMap').fitCenterZoomToMarkers();
 
             this.listenTo( this.get('stores'), 'sync', function( stores ) {
+                //map load markers in mapView sync to storeCollection
                 this.fitMapToNearestMarkers( 2 );
             });
         });
 
         this.addressView.$el.bind('address:select', function( evt, result ) {
-            //console.log('address:select', result);
-
             serviceContainer.setLocation({
                 lat: result.lat,
                 lng: result.lng
             });
         });
+
+        this.mapView.$el.bind('map:bounds_changed', function( evt, bounds ) {
+            serviceContainer.set('mapBounds', bounds);
+
+            console.log('new bounds', bounds);
+        });
+
+        serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
+            var easyMap = serviceContainer.get('easyMap');
+            easyMap.setCenter(mapLocation.lat, mapLocation.lng);
+            //easyMap.setZoom(10);
+        });
     }
 
     createServiceContainer({ storesUrl }) {
-        //var { storesUrl } = config;
         var ServiceContainer = AbstractServiceContainer.extend({
             comparator: 'distance',
             getLocation: function() {
@@ -106,7 +131,7 @@ export default class Mapinator {
         return new ServiceContainer(
             {
                 StoreCollectionFactory,
-                StoreModelFactory
+                StoreModelClassFactory
             },
             {
                 url: storesUrl,
@@ -153,7 +178,7 @@ export default class Mapinator {
     createAddressView( config, serviceContainer ) {
         return AddressViewFactory({}, {
             el: config.addressSelector,
-            cancelAddressSelector: '.cancel-address',
+            cancelAddressButton: '.cancel-address',
             serviceContainer: serviceContainer,
             /*mapSelector: config.mapSelector,
             mapLocation: config.mapLocation,
@@ -184,7 +209,7 @@ export default class Mapinator {
                 'disableDoubleClickZoom': false,
                 'draggable': true
             },
-            markerIcon: config.getStoreIconPath(),
+            markerIcon: typeof config.iconPath === 'function' ? config.iconPath() : config.iconPath,
             infoWindow: function( data ) {
                 if( !data ) return false;
 
@@ -195,7 +220,7 @@ export default class Mapinator {
                 $info.find('.title').html( data.title );
                 $info.find('.street').html( data.street );
 
-                var phone = data.phone.trim() ? $info.find('.phone').html() + data.phone : '';
+                var phone = data.phone && data.phone.trim() ? $info.find('.phone').html() + data.phone : '';
                 $info.find('.phone').html( phone );
 
 

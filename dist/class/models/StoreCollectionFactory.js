@@ -17,13 +17,15 @@ var storeCollection = {
         console.log('initialize', arguments);
     },*/
 
-    fetchStores: function fetchStores(location) {
+    fetchStores: function fetchStores(_ref) {
+        var lat = _ref.lat;
+        var lng = _ref.lng;
         var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 
         return this.fetch({
             data: {
-                lat: location.lat,
-                lng: location.lng
+                lat: lat,
+                lng: lng
             },
             success: function success(data) {
                 callback(data);

@@ -49,17 +49,32 @@ var mapView = {
         map.addListener('bounds_changed', function () {
             window.clearTimeout(view._t);
             view._t = window.setTimeout(function () {
-                serviceContainer.set('mapBounds', map.getBounds());
+                //serviceContainer.set('mapBounds', map.getBounds());
+                view.$el.trigger('map:bounds_changed', map.getBounds());
             }, 800);
         });
 
         this.listenTo(this.collection, 'sync', function (collection, resp, req) {
-            view.refreshMap(collection, easyMap, markerIcon, infoWindow);
+            view.refreshMap({ collection: collection, easyMap: easyMap, iconPath: markerIcon, infoWindowCreator: infoWindow });
         });
     },
 
-    refreshMap: function refreshMap(collection, easyMap, iconPath, infoWindowCreator) {
-        easyMap.removeAllMarker();
+    refreshMap: function refreshMap(_ref2) {
+        var collection = _ref2.collection;
+        var easyMap = _ref2.easyMap;
+        var iconPath = _ref2.iconPath;
+        var infoWindowCreator = _ref2.infoWindowCreator;
+
+        this.removeAllMarkers(easyMap);
+        this.loadMarkers({ collection: collection, easyMap: easyMap, iconPath: iconPath, infoWindowCreator: infoWindowCreator });
+    },
+
+    loadMarkers: function loadMarkers(_ref3) {
+        var collection = _ref3.collection;
+        var easyMap = _ref3.easyMap;
+        var iconPath = _ref3.iconPath;
+        var infoWindowCreator = _ref3.infoWindowCreator;
+
         for (var n in collection.models) {
             var model = collection.models[n];
 
@@ -87,6 +102,10 @@ var mapView = {
 
         //todo: togliere?
         //easyMap.fitCenterZoomToMarkers();
+    },
+
+    removeAllMarkers: function removeAllMarkers(easyMap) {
+        easyMap.removeAllMarker();
     }
 };
 
