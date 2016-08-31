@@ -26,22 +26,44 @@ export default class Mapinator {
         this.mapView = this.createMapView( config, this.serviceContainer );
         this.mapView.$el.bind('map:loaded', ( evt ) => {
             this.serviceContainer.setLocation( config.mapLocation );
+
+            this.serviceContainer.set('mapLoaded', true);
+
             this.mapView.$el.unbind('map:loaded');
         });
 
         this.bindEvents();
 
-        this.refreshStores( config.mapLocation );
+    }
+    bindEvents() {
+        var serviceContainer = this.serviceContainer;
+
+        this.addressView.$el.bind('address:select', function( evt, result ) {
+            serviceContainer.setLocation({
+                lat: result.lat,
+                lng: result.lng
+            });
+        });
+        serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
+            serviceContainer.get('easyMap').setCenter( mapLocation.lat, mapLocation.lng );
+            //easyMap.setZoom(10);
+        });
+
+        this.mapView.$el.bind('map:bounds_changed', function( evt, bounds ) {
+            serviceContainer.set('mapBounds', bounds);
+        });
     }
 
     refreshStores( location, callback = () => {} ) {
         this.showLoading();
 
-        return this.serviceContainer.get('stores').fetchStores( location, ( stores ) => {
+        this.serviceContainer.get('stores').once('sync', ( serviceContainer, stores ) => {
             callback( stores );
 
             this.hideLoading();
         });
+
+        return this.serviceContainer.get('stores').fetchStores( location );
     }
     showLoading() {
         var { startLoading = () => {} } = this.config;
@@ -54,37 +76,35 @@ export default class Mapinator {
         endLoading();
     }
 
-    bindEvents() {
-        var serviceContainer = this.serviceContainer;
 
-        serviceContainer.listenToOnce( serviceContainer.get('stores'), 'sync', function( stores ) {
-            serviceContainer.get('easyMap').fitCenterZoomToMarkers();
-
-            this.listenTo( this.get('stores'), 'sync', function( stores ) {
-                //map load markers in mapView sync to storeCollection
-                this.fitMapToNearestMarkers( 2 );
-            });
-        });
-
-        this.addressView.$el.bind('address:select', function( evt, result ) {
-            serviceContainer.setLocation({
-                lat: result.lat,
-                lng: result.lng
-            });
-        });
-
-        this.mapView.$el.bind('map:bounds_changed', function( evt, bounds ) {
-            serviceContainer.set('mapBounds', bounds);
-
-            console.log('new bounds', bounds);
-        });
-
-        serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
-            var easyMap = serviceContainer.get('easyMap');
-            easyMap.setCenter(mapLocation.lat, mapLocation.lng);
-            //easyMap.setZoom(10);
-        });
+    fitMapToMarkers() {
+        this.serviceContainer.get('easyMap').fitCenterZoomToMarkers();
     }
+    fitMapToNearestMarkers( min, center ) {
+        if( !min ) min = 1;
+
+        var serviceContainer = this.serviceContainer;
+        var mapLocation = center || serviceContainer.get('mapLocation');
+
+        var bounds = new google.maps.LatLngBounds();
+        bounds.extend( new google.maps.LatLng(mapLocation.lat, mapLocation.lng) );
+
+        var minStores = serviceContainer.get('stores').models.slice(0, min);
+        for( var n in minStores ) {
+            var store = minStores[n];
+
+            console.log('store', n, store.get('lat'), store.get('lng'));
+
+            if( !bounds.contains(new google.maps.LatLng( store.get('lat'), store.get('lng') )) ) {
+                bounds.extend(new google.maps.LatLng( store.get('lat'), store.get('lng') ));
+            }
+        }
+
+        serviceContainer.get('easyMap').setZoom( 30 );
+
+        serviceContainer.get('map').fitBounds( bounds );
+    }
+
 
     createServiceContainer({ storesUrl }) {
         var ServiceContainer = AbstractServiceContainer.extend({
@@ -158,7 +178,7 @@ export default class Mapinator {
             }
         );
     }
-    bindServiceContainer( serviceContainer ) {
+    /*bindServiceContainer( serviceContainer ) {
         serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
             var easyMap = serviceContainer.get('easyMap');
             easyMap.setCenter(mapLocation.lat, mapLocation.lng);
@@ -173,7 +193,7 @@ export default class Mapinator {
         });
 
         return serviceContainer;
-    }
+    }*/
 
     createAddressView( config, serviceContainer ) {
         return AddressViewFactory({}, {

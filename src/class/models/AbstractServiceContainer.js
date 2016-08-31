@@ -19,7 +19,8 @@ export default class AbstractServiceContainer extends Model {
                 mapLocation: {
                     lat: null,
                     lng: null
-                }
+                },
+                mapLoaded: false
             }
         };
         super( classProps, { StoreCollectionFactory, StoreModelClassFactory }, { url, normalizeRequestData, parseResponse });

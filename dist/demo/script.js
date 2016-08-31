@@ -69,4 +69,25 @@ var mapinator = new Mapinator( config );
 
 console.log( mapinator );
 
+mapinator.serviceContainer.once('change:mapLoaded', function( serviceContainer, mapLoaded ) {
+    mapinator.refreshStores( serviceContainer.get('mapLocation'), () => {
+        mapinator.fitMapToMarkers();
+
+        serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
+            console.log('change:mapLocation', mapLocation);
+
+            mapinator.refreshStores( mapLocation, ( stores ) => {
+                mapinator.fitMapToNearestMarkers( 2, mapLocation );
+            });
+        });
+    });
+});
+
+mapinator.serviceContainer.on('change:mapBounds', function( serviceContainer, mapBounds ) {
+    console.log('change:mapBounds', mapBounds);
+    //todo: mostra storePanel
+});
+
+
+
 

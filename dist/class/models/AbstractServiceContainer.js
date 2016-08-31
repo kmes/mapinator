@@ -49,7 +49,8 @@ var AbstractServiceContainer = function (_Model) {
                 mapLocation: {
                     lat: null,
                     lng: null
-                }
+                },
+                mapLoaded: false
             }
         };
         return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelClassFactory: StoreModelClassFactory }, { url: url, normalizeRequestData: normalizeRequestData, parseResponse: parseResponse }));

@@ -49,7 +49,6 @@ var mapView = {
         map.addListener('bounds_changed', function () {
             window.clearTimeout(view._t);
             view._t = window.setTimeout(function () {
-                //serviceContainer.set('mapBounds', map.getBounds());
                 view.$el.trigger('map:bounds_changed', map.getBounds());
             }, 800);
         });

@@ -63,15 +63,48 @@ var Mapinator = function () {
         this.mapView = this.createMapView(config, this.serviceContainer);
         this.mapView.$el.bind('map:loaded', function (evt) {
             _this.serviceContainer.setLocation(config.mapLocation);
+
+            _this.serviceContainer.set('mapLoaded', true);
+
+            //this.refreshStores( config.mapLocation );
+
             _this.mapView.$el.unbind('map:loaded');
         });
 
         this.bindEvents();
 
-        this.refreshStores(config.mapLocation);
+        //
     }
 
     _createClass(Mapinator, [{
+        key: 'bindEvents',
+        value: function bindEvents() {
+            var serviceContainer = this.serviceContainer;
+
+            /*serviceContainer.listenToOnce( serviceContainer.get('stores'), 'sync', function( stores ) {
+                serviceContainer.get('easyMap').fitCenterZoomToMarkers();
+                 this.listenTo( this.get('stores'), 'sync', function( stores ) {
+                    //map load markers in mapView sync to storeCollection
+                    //this.fitMapToNearestMarkers( 2 );
+                });
+            });*/
+
+            this.addressView.$el.bind('address:select', function (evt, result) {
+                serviceContainer.setLocation({
+                    lat: result.lat,
+                    lng: result.lng
+                });
+            });
+            serviceContainer.on('change:mapLocation', function (serviceContainer, mapLocation) {
+                serviceContainer.get('easyMap').setCenter(mapLocation.lat, mapLocation.lng);
+                //easyMap.setZoom(10);
+            });
+
+            this.mapView.$el.bind('map:bounds_changed', function (evt, bounds) {
+                serviceContainer.set('mapBounds', bounds);
+            });
+        }
+    }, {
         key: 'refreshStores',
         value: function refreshStores(location) {
             var _this2 = this;
@@ -80,11 +113,13 @@ var Mapinator = function () {
 
             this.showLoading();
 
-            return this.serviceContainer.get('stores').fetchStores(location, function (stores) {
+            this.serviceContainer.get('stores').once('sync', function (serviceContainer, stores) {
                 callback(stores);
 
                 _this2.hideLoading();
             });
+
+            return this.serviceContainer.get('stores').fetchStores(location);
         }
     }, {
         key: 'showLoading',
@@ -105,37 +140,35 @@ var Mapinator = function () {
             endLoading();
         }
     }, {
-        key: 'bindEvents',
-        value: function bindEvents() {
+        key: 'fitMapToMarkers',
+        value: function fitMapToMarkers() {
+            this.serviceContainer.get('easyMap').fitCenterZoomToMarkers();
+        }
+    }, {
+        key: 'fitMapToNearestMarkers',
+        value: function fitMapToNearestMarkers(min, center) {
+            if (!min) min = 1;
+
             var serviceContainer = this.serviceContainer;
+            var mapLocation = center || serviceContainer.get('mapLocation');
 
-            serviceContainer.listenToOnce(serviceContainer.get('stores'), 'sync', function (stores) {
-                serviceContainer.get('easyMap').fitCenterZoomToMarkers();
+            var bounds = new google.maps.LatLngBounds();
+            bounds.extend(new google.maps.LatLng(mapLocation.lat, mapLocation.lng));
 
-                this.listenTo(this.get('stores'), 'sync', function (stores) {
-                    //map load markers in mapView sync to storeCollection
-                    this.fitMapToNearestMarkers(2);
-                });
-            });
+            var minStores = serviceContainer.get('stores').models.slice(0, min);
+            for (var n in minStores) {
+                var store = minStores[n];
 
-            this.addressView.$el.bind('address:select', function (evt, result) {
-                serviceContainer.setLocation({
-                    lat: result.lat,
-                    lng: result.lng
-                });
-            });
+                console.log('store', n, store.get('lat'), store.get('lng'));
 
-            this.mapView.$el.bind('map:bounds_changed', function (evt, bounds) {
-                serviceContainer.set('mapBounds', bounds);
+                if (!bounds.contains(new google.maps.LatLng(store.get('lat'), store.get('lng')))) {
+                    bounds.extend(new google.maps.LatLng(store.get('lat'), store.get('lng')));
+                }
+            }
 
-                console.log('new bounds', bounds);
-            });
+            serviceContainer.get('easyMap').setZoom(30);
 
-            serviceContainer.on('change:mapLocation', function (serviceContainer, mapLocation) {
-                var easyMap = serviceContainer.get('easyMap');
-                easyMap.setCenter(mapLocation.lat, mapLocation.lng);
-                //easyMap.setZoom(10);
-            });
+            serviceContainer.get('map').fitBounds(bounds);
         }
     }, {
         key: 'createServiceContainer',
@@ -208,24 +241,21 @@ var Mapinator = function () {
                 }
             });
         }
-    }, {
-        key: 'bindServiceContainer',
-        value: function bindServiceContainer(serviceContainer) {
-            serviceContainer.on('change:mapLocation', function (serviceContainer, mapLocation) {
+        /*bindServiceContainer( serviceContainer ) {
+            serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
                 var easyMap = serviceContainer.get('easyMap');
                 easyMap.setCenter(mapLocation.lat, mapLocation.lng);
                 easyMap.setZoom(10);
             });
-            serviceContainer.listenToOnce(serviceContainer.get('stores'), 'sync', function (stores) {
+            serviceContainer.listenToOnce( serviceContainer.get('stores'), 'sync', function( stores ) {
                 this.get('easyMap').fitCenterZoomToMarkers();
-
-                this.listenTo(this.get('stores'), 'sync', function (stores) {
-                    this.fitMapToNearestMarkers(2);
+                 this.listenTo( this.get('stores'), 'sync', function( stores ) {
+                    this.fitMapToNearestMarkers( 2 );
                 });
             });
+             return serviceContainer;
+        }*/
 
-            return serviceContainer;
-        }
     }, {
         key: 'createAddressView',
         value: function createAddressView(config, serviceContainer) {
