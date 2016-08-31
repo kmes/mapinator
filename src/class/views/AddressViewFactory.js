@@ -32,33 +32,13 @@ const addressView = {
             serviceAdapter.fetchLatLng({ placeId: result['place_id'] }, function( placeDetails ) {
                 if( !placeDetails ) throw new Error('Error to fetch place position');
 
-                /*var newResult = {
-                    ...result,
-                    lat: placeDetails.geometry.location.lat(),
-                    lng: placeDetails.geometry.location.lng()
-                };*/
                 result.lat = placeDetails.geometry.location.lat();
                 result.lng = placeDetails.geometry.location.lng();
-
-                //console.log('fetchLatLng', result);
-
-                //placeEngine.add( [newResult] );
 
                 view.$el.trigger( 'address:select', result );
             });
 
-
-
         });
-
-        if( typeof options.cancelAddressButton === 'string' || options.cancelAddressButton instanceof HTMLElement ) {
-            jQuery( options.cancelAddressButton ).bind('click', function( evt ) {
-                console.log('click');
-
-                view.el.value = '';
-                view.el.focus();
-            });
-        }
 
     },
     pickerHandler: function( evt, result ) {

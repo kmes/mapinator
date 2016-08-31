@@ -34,12 +34,6 @@ var _MapViewFactory = require('./views/MapViewFactory');
 
 var _MapViewFactory2 = _interopRequireDefault(_MapViewFactory);
 
-var _helper = require('./helper/helper');
-
-var Helper = _interopRequireWildcard(_helper);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -66,28 +60,16 @@ var Mapinator = function () {
 
             _this.serviceContainer.set('mapLoaded', true);
 
-            //this.refreshStores( config.mapLocation );
-
             _this.mapView.$el.unbind('map:loaded');
         });
 
         this.bindEvents();
-
-        //
     }
 
     _createClass(Mapinator, [{
         key: 'bindEvents',
         value: function bindEvents() {
             var serviceContainer = this.serviceContainer;
-
-            /*serviceContainer.listenToOnce( serviceContainer.get('stores'), 'sync', function( stores ) {
-                serviceContainer.get('easyMap').fitCenterZoomToMarkers();
-                 this.listenTo( this.get('stores'), 'sync', function( stores ) {
-                    //map load markers in mapView sync to storeCollection
-                    //this.fitMapToNearestMarkers( 2 );
-                });
-            });*/
 
             this.addressView.$el.bind('address:select', function (evt, result) {
                 serviceContainer.setLocation({
@@ -174,9 +156,14 @@ var Mapinator = function () {
         key: 'createServiceContainer',
         value: function createServiceContainer(_ref) {
             var storesUrl = _ref.storesUrl;
+            var storesComparator = _ref.storesComparator;
+            var _ref$parseResponse = _ref.parseResponse;
+            var parseResponse = _ref$parseResponse === undefined ? function (resp) {
+                return resp;
+            } : _ref$parseResponse;
 
             var ServiceContainer = _AbstractServiceContainer2.default.extend({
-                comparator: 'distance',
+                comparator: storesComparator,
                 getLocation: function getLocation() {
                     return this.get('mapLocation');
                 },
@@ -222,50 +209,15 @@ var Mapinator = function () {
                 normalizeRequestData: function normalizeRequestData(requestData) {
                     return requestData;
                 },
-                parseResponse: function parseResponse(response) {
-                    return response.collections.map(function (data) {
-                        return {
-                            id: data.id,
-                            title: data.title,
-                            lat: parseFloat(data.lat),
-                            lng: parseFloat(data.lng),
-                            phone: data.phone,
-                            sanitizedPhone: Helper.sanitizePhone(data.phone),
-                            street: data.street,
-                            distance: data.distance || '',
-                            indication: data.indication,
-                            calendar: data.hours,
-                            extraCalendar: data.extrahours
-                        };
-                    });
-                }
+                parseResponse: parseResponse
             });
         }
-        /*bindServiceContainer( serviceContainer ) {
-            serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
-                var easyMap = serviceContainer.get('easyMap');
-                easyMap.setCenter(mapLocation.lat, mapLocation.lng);
-                easyMap.setZoom(10);
-            });
-            serviceContainer.listenToOnce( serviceContainer.get('stores'), 'sync', function( stores ) {
-                this.get('easyMap').fitCenterZoomToMarkers();
-                 this.listenTo( this.get('stores'), 'sync', function( stores ) {
-                    this.fitMapToNearestMarkers( 2 );
-                });
-            });
-             return serviceContainer;
-        }*/
-
     }, {
         key: 'createAddressView',
         value: function createAddressView(config, serviceContainer) {
             return (0, _AddressViewFactory2.default)({}, {
                 el: config.addressSelector,
-                cancelAddressButton: '.cancel-address',
                 serviceContainer: serviceContainer,
-                /*mapSelector: config.mapSelector,
-                mapLocation: config.mapLocation,
-                mapOptions: config.mapOptions,*/
                 address: config.address,
 
                 collection: serviceContainer.get('stores'),
@@ -295,24 +247,7 @@ var Mapinator = function () {
                     'draggable': true
                 },
                 markerIcon: typeof config.iconPath === 'function' ? config.iconPath() : config.iconPath,
-                infoWindow: function infoWindow(data) {
-                    if (!data) return false;
-
-                    var $info = (0, _jquery2.default)(config.infoWindowProto).clone(true, true);
-
-                    $info.removeClass('hidden');
-
-                    $info.find('.title').html(data.title);
-                    $info.find('.street').html(data.street);
-
-                    var phone = data.phone && data.phone.trim() ? $info.find('.phone').html() + data.phone : '';
-                    $info.find('.phone').html(phone);
-
-                    var href = $info.find('.link-hours').attr('href');
-                    $info.find('.link-hours').attr('href', href + data.id);
-
-                    return (0, _jquery2.default)('<div></div>').append($info).html();
-                },
+                infoWindow: config.infoWindow,
                 collection: serviceContainer.get('stores')
             });
         }

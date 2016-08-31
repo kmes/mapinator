@@ -11,8 +11,6 @@ import StoreCollectionFactory from './models/StoreCollectionFactory';
 import AddressViewFactory from './views/AddressViewFactory';
 import MapViewFactory from './views/MapViewFactory';
 
-import * as Helper from './helper/helper';
-
 export default class Mapinator {
     constructor( config ) {
         this.config = config;
@@ -105,10 +103,9 @@ export default class Mapinator {
         serviceContainer.get('map').fitBounds( bounds );
     }
 
-
-    createServiceContainer({ storesUrl }) {
+    createServiceContainer({ storesUrl, storesComparator, parseResponse = (resp) => resp }) {
         var ServiceContainer = AbstractServiceContainer.extend({
-            comparator: 'distance',
+            comparator: storesComparator,
             getLocation: function() {
                 return this.get('mapLocation');
             },
@@ -158,51 +155,14 @@ export default class Mapinator {
                 normalizeRequestData: function( requestData ) {
                     return requestData;
                 },
-                parseResponse: function( response ) {
-                    return response.collections.map(function( data ) {
-                        return {
-                            id: data.id,
-                            title: data.title,
-                            lat: parseFloat( data.lat ),
-                            lng: parseFloat( data.lng ),
-                            phone: data.phone,
-                            sanitizedPhone: Helper.sanitizePhone( data.phone ),
-                            street: data.street,
-                            distance: data.distance || '',
-                            indication: data.indication,
-                            calendar: data.hours,
-                            extraCalendar: data.extrahours
-                        };
-                    });
-                }
+                parseResponse
             }
         );
     }
-    /*bindServiceContainer( serviceContainer ) {
-        serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
-            var easyMap = serviceContainer.get('easyMap');
-            easyMap.setCenter(mapLocation.lat, mapLocation.lng);
-            easyMap.setZoom(10);
-        });
-        serviceContainer.listenToOnce( serviceContainer.get('stores'), 'sync', function( stores ) {
-            this.get('easyMap').fitCenterZoomToMarkers();
-
-            this.listenTo( this.get('stores'), 'sync', function( stores ) {
-                this.fitMapToNearestMarkers( 2 );
-            });
-        });
-
-        return serviceContainer;
-    }*/
-
     createAddressView( config, serviceContainer ) {
         return AddressViewFactory({}, {
             el: config.addressSelector,
-            cancelAddressButton: '.cancel-address',
             serviceContainer: serviceContainer,
-            /*mapSelector: config.mapSelector,
-            mapLocation: config.mapLocation,
-            mapOptions: config.mapOptions,*/
             address: config.address,
 
             collection: serviceContainer.get('stores'),
@@ -230,25 +190,7 @@ export default class Mapinator {
                 'draggable': true
             },
             markerIcon: typeof config.iconPath === 'function' ? config.iconPath() : config.iconPath,
-            infoWindow: function( data ) {
-                if( !data ) return false;
-
-                var $info = jQuery( config.infoWindowProto ).clone(true, true);
-
-                $info.removeClass('hidden');
-
-                $info.find('.title').html( data.title );
-                $info.find('.street').html( data.street );
-
-                var phone = data.phone && data.phone.trim() ? $info.find('.phone').html() + data.phone : '';
-                $info.find('.phone').html( phone );
-
-
-                var href = $info.find('.link-hours').attr('href');
-                $info.find('.link-hours').attr('href', href+data.id);
-
-                return jQuery('<div></div>').append( $info ).html();
-            },
+            infoWindow: config.infoWindow,
             collection: serviceContainer.get('stores')
         });
     }

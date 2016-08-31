@@ -17890,12 +17890,6 @@ var _MapViewFactory = require('./views/MapViewFactory');
 
 var _MapViewFactory2 = _interopRequireDefault(_MapViewFactory);
 
-var _helper = require('./helper/helper');
-
-var Helper = _interopRequireWildcard(_helper);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -17922,28 +17916,16 @@ var Mapinator = function () {
 
             _this.serviceContainer.set('mapLoaded', true);
 
-            //this.refreshStores( config.mapLocation );
-
             _this.mapView.$el.unbind('map:loaded');
         });
 
         this.bindEvents();
-
-        //
     }
 
     _createClass(Mapinator, [{
         key: 'bindEvents',
         value: function bindEvents() {
             var serviceContainer = this.serviceContainer;
-
-            /*serviceContainer.listenToOnce( serviceContainer.get('stores'), 'sync', function( stores ) {
-                serviceContainer.get('easyMap').fitCenterZoomToMarkers();
-                 this.listenTo( this.get('stores'), 'sync', function( stores ) {
-                    //map load markers in mapView sync to storeCollection
-                    //this.fitMapToNearestMarkers( 2 );
-                });
-            });*/
 
             this.addressView.$el.bind('address:select', function (evt, result) {
                 serviceContainer.setLocation({
@@ -18030,9 +18012,14 @@ var Mapinator = function () {
         key: 'createServiceContainer',
         value: function createServiceContainer(_ref) {
             var storesUrl = _ref.storesUrl;
+            var storesComparator = _ref.storesComparator;
+            var _ref$parseResponse = _ref.parseResponse;
+            var parseResponse = _ref$parseResponse === undefined ? function (resp) {
+                return resp;
+            } : _ref$parseResponse;
 
             var ServiceContainer = _AbstractServiceContainer2.default.extend({
-                comparator: 'distance',
+                comparator: storesComparator,
                 getLocation: function getLocation() {
                     return this.get('mapLocation');
                 },
@@ -18078,50 +18065,15 @@ var Mapinator = function () {
                 normalizeRequestData: function normalizeRequestData(requestData) {
                     return requestData;
                 },
-                parseResponse: function parseResponse(response) {
-                    return response.collections.map(function (data) {
-                        return {
-                            id: data.id,
-                            title: data.title,
-                            lat: parseFloat(data.lat),
-                            lng: parseFloat(data.lng),
-                            phone: data.phone,
-                            sanitizedPhone: Helper.sanitizePhone(data.phone),
-                            street: data.street,
-                            distance: data.distance || '',
-                            indication: data.indication,
-                            calendar: data.hours,
-                            extraCalendar: data.extrahours
-                        };
-                    });
-                }
+                parseResponse: parseResponse
             });
         }
-        /*bindServiceContainer( serviceContainer ) {
-            serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
-                var easyMap = serviceContainer.get('easyMap');
-                easyMap.setCenter(mapLocation.lat, mapLocation.lng);
-                easyMap.setZoom(10);
-            });
-            serviceContainer.listenToOnce( serviceContainer.get('stores'), 'sync', function( stores ) {
-                this.get('easyMap').fitCenterZoomToMarkers();
-                 this.listenTo( this.get('stores'), 'sync', function( stores ) {
-                    this.fitMapToNearestMarkers( 2 );
-                });
-            });
-             return serviceContainer;
-        }*/
-
     }, {
         key: 'createAddressView',
         value: function createAddressView(config, serviceContainer) {
             return (0, _AddressViewFactory2.default)({}, {
                 el: config.addressSelector,
-                cancelAddressButton: '.cancel-address',
                 serviceContainer: serviceContainer,
-                /*mapSelector: config.mapSelector,
-                mapLocation: config.mapLocation,
-                mapOptions: config.mapOptions,*/
                 address: config.address,
 
                 collection: serviceContainer.get('stores'),
@@ -18151,24 +18103,7 @@ var Mapinator = function () {
                     'draggable': true
                 },
                 markerIcon: typeof config.iconPath === 'function' ? config.iconPath() : config.iconPath,
-                infoWindow: function infoWindow(data) {
-                    if (!data) return false;
-
-                    var $info = (0, _jquery2.default)(config.infoWindowProto).clone(true, true);
-
-                    $info.removeClass('hidden');
-
-                    $info.find('.title').html(data.title);
-                    $info.find('.street').html(data.street);
-
-                    var phone = data.phone && data.phone.trim() ? $info.find('.phone').html() + data.phone : '';
-                    $info.find('.phone').html(phone);
-
-                    var href = $info.find('.link-hours').attr('href');
-                    $info.find('.link-hours').attr('href', href + data.id);
-
-                    return (0, _jquery2.default)('<div></div>').append($info).html();
-                },
+                infoWindow: config.infoWindow,
                 collection: serviceContainer.get('stores')
             });
         }
@@ -18179,18 +18114,7 @@ var Mapinator = function () {
 
 exports.default = Mapinator;
 
-},{"./helper/helper":7,"./models/AbstractServiceContainer":8,"./models/StoreCollectionFactory":9,"./models/StoreModelClassFactory":10,"./vendor/EasyMaps.js":11,"./views/AddressViewFactory":17,"./views/MapViewFactory":18,"jquery":2}],7:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.sanitizePhone = sanitizePhone;
-function sanitizePhone(phone) {
-    return phone;
-}
-
-},{}],8:[function(require,module,exports){
+},{"./models/AbstractServiceContainer":7,"./models/StoreCollectionFactory":8,"./models/StoreModelClassFactory":9,"./vendor/EasyMaps.js":10,"./views/AddressViewFactory":16,"./views/MapViewFactory":17,"jquery":2}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18339,7 +18263,7 @@ function AbstractServiceContainerClassFactory() {
     return AbstractServiceContainer;
 }
 
-},{"../vendor/PlacesAdapter":12,"backbone":1}],9:[function(require,module,exports){
+},{"../vendor/PlacesAdapter":11,"backbone":1}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18381,7 +18305,7 @@ var storeCollection = {
 
 exports.default = (0, _backboneFactory2.default)(storeCollection, _backbone.Collection);
 
-},{"../vendor/backboneFactory":15,"backbone":1}],10:[function(require,module,exports){
+},{"../vendor/backboneFactory":14,"backbone":1}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -18404,7 +18328,7 @@ var storeModel = {
 
 exports.default = (0, _backboneClassFactory2.default)(storeModel, _backbone.Model);
 
-},{"../vendor/backboneClassFactory":14,"backbone":1}],11:[function(require,module,exports){
+},{"../vendor/backboneClassFactory":13,"backbone":1}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19069,7 +18993,7 @@ EasyMaps.prototype.autocomplete = function (domElement, fnCallback) {
 
 exports.default = EasyMaps;
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19153,7 +19077,7 @@ var PlacesAdapter = function () {
 
 exports.default = PlacesAdapter;
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19232,7 +19156,7 @@ var PlacesBloodhoundEngine = function (_Bloodhound) {
 
 exports.default = PlacesBloodhoundEngine;
 
-},{"typeahead.js/dist/bloodhound":3}],14:[function(require,module,exports){
+},{"typeahead.js/dist/bloodhound":3}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19248,7 +19172,7 @@ function backboneClassFactory(customObj, BackboneClass) {
 
 exports.default = backboneClassFactory;
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19278,7 +19202,7 @@ function backboneFactory(customObj, BackboneClass) {
 
 exports.default = backboneFactory;
 
-},{"./backboneClassFactory":14}],16:[function(require,module,exports){
+},{"./backboneClassFactory":13}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19300,7 +19224,7 @@ function typeaheadFactory(selector) {
     }, options));
 }
 
-},{"typeahead.js":4}],17:[function(require,module,exports){
+},{"typeahead.js":4}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19350,30 +19274,12 @@ var addressView = {
             serviceAdapter.fetchLatLng({ placeId: result['place_id'] }, function (placeDetails) {
                 if (!placeDetails) throw new Error('Error to fetch place position');
 
-                /*var newResult = {
-                    ...result,
-                    lat: placeDetails.geometry.location.lat(),
-                    lng: placeDetails.geometry.location.lng()
-                };*/
                 result.lat = placeDetails.geometry.location.lat();
                 result.lng = placeDetails.geometry.location.lng();
-
-                //console.log('fetchLatLng', result);
-
-                //placeEngine.add( [newResult] );
 
                 view.$el.trigger('address:select', result);
             });
         });
-
-        if (typeof options.cancelAddressButton === 'string' || options.cancelAddressButton instanceof HTMLElement) {
-            jQuery(options.cancelAddressButton).bind('click', function (evt) {
-                console.log('click');
-
-                view.el.value = '';
-                view.el.focus();
-            });
-        }
     },
     pickerHandler: function pickerHandler(evt, result) {
         var view = this;
@@ -19405,7 +19311,7 @@ var addressView = {
 
 exports.default = (0, _backboneFactory2.default)(addressView, _backbone.View);
 
-},{"../vendor/PlacesBloodhoundEngine":13,"../vendor/backboneFactory":15,"../vendor/typeaheadFactory":16,"backbone":1}],18:[function(require,module,exports){
+},{"../vendor/PlacesBloodhoundEngine":12,"../vendor/backboneFactory":14,"../vendor/typeaheadFactory":15,"backbone":1}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -19518,7 +19424,7 @@ var mapView = {
 
 exports.default = (0, _backboneFactory2.default)(mapView, _backbone.View);
 
-},{"../vendor/backboneFactory":15,"backbone":1}],19:[function(require,module,exports){
+},{"../vendor/backboneFactory":14,"backbone":1}],18:[function(require,module,exports){
 'use strict';
 
 var _Mapinator = require('./class/Mapinator');
@@ -19532,4 +19438,4 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 window.Mapinator = _Mapinator2.default;
 //window.AbstractServiceContainer = AbstractServiceContainer;
 
-},{"./class/Mapinator":6}]},{},[19]);
+},{"./class/Mapinator":6}]},{},[18]);
