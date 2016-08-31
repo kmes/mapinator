@@ -29,7 +29,6 @@ var AbstractServiceContainer = function (_Model) {
         var StoreCollectionFactory = _ref.StoreCollectionFactory;
         var StoreModelClassFactory = _ref.StoreModelClassFactory;
         var url = _ref2.url;
-        var normalizeRequestData = _ref2.normalizeRequestData;
         var parseResponse = _ref2.parseResponse;
 
         _classCallCheck(this, AbstractServiceContainer);
@@ -53,7 +52,7 @@ var AbstractServiceContainer = function (_Model) {
                 mapLoaded: false
             }
         };
-        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelClassFactory: StoreModelClassFactory }, { url: url, normalizeRequestData: normalizeRequestData, parseResponse: parseResponse }));
+        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelClassFactory: StoreModelClassFactory }, { url: url, parseResponse: parseResponse }));
     }
 
     _createClass(AbstractServiceContainer, [{
@@ -62,7 +61,6 @@ var AbstractServiceContainer = function (_Model) {
             var StoreCollectionFactory = _ref3.StoreCollectionFactory;
             var StoreModelClassFactory = _ref3.StoreModelClassFactory;
             var url = _ref4.url;
-            var normalizeRequestData = _ref4.normalizeRequestData;
             var parseResponse = _ref4.parseResponse;
 
             this.set('mapBounds', new google.maps.LatLngBounds());

@@ -60,11 +60,14 @@ jQuery('.cancel-address').on('click', function( evt ) {
 
 
 var mapinator = new Mapinator({
-    storesUrl: function() {
-        console.log('url', this);
+    storesUrl: function( serviceContainer ) {
+        console.log('url', this, arguments);
         return '/stores.json';
     },
-    storesComparator: 'distance',
+    parseRequest: function( request ) {
+        //return null;
+        return request;
+    },
     parseResponse: function( response ) {
         return response.collections.map(function( data ) {
             return {
@@ -82,6 +85,7 @@ var mapinator = new Mapinator({
             };
         });
     },
+    storesComparator: 'distance',
     mapSelector: '#map',
     addressSelector: '#addressSearch',
     address: 'Italia',
@@ -129,13 +133,14 @@ var mapinator = new Mapinator({
 console.log( mapinator );
 
 mapinator.serviceContainer.once('change:mapLoaded', function( serviceContainer, mapLoaded ) {
-    mapinator.refreshStores( serviceContainer.get('mapLocation'), () => {
+    var mapLocation = serviceContainer.get('mapLocation');
+    mapinator.refreshStores( { data: mapLocation }, () => {
         mapinator.fitMapToMarkers();
 
         serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
             console.log('change:mapLocation', mapLocation);
 
-            mapinator.refreshStores( mapLocation, ( stores ) => {
+            mapinator.refreshStores( { data: mapLocation }, ( stores ) => {
                 mapinator.fitMapToNearestMarkers( 2, mapLocation );
             });
         });

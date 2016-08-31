@@ -17,7 +17,6 @@ export default class Mapinator {
 
         this.serviceContainer = this.createServiceContainer( config );
         this.serviceContainer.set('jQuery', $);
-        //this.bindServiceContainer( this.serviceContainer );
 
         this.addressView = this.createAddressView( config, this.serviceContainer );
 
@@ -52,7 +51,7 @@ export default class Mapinator {
         });
     }
 
-    refreshStores( location, callback = () => {} ) {
+    refreshStores( options, callback = () => {} ) {
         this.showLoading();
 
         this.serviceContainer.get('stores').once('sync', ( serviceContainer, stores ) => {
@@ -61,7 +60,14 @@ export default class Mapinator {
             this.hideLoading();
         });
 
-        return this.serviceContainer.get('stores').fetchStores( location );
+
+        return this.serviceContainer.get('stores').fetchStores({
+            url: typeof this.config.storesUrl === 'function' ? this.config.storesUrl( this.serviceContainer ) : this.config.storesUrl,
+
+            ...options,
+
+            data: typeof this.config.parseRequest === 'function' ? this.config.parseRequest( options.data ) : options.data
+        });
     }
     showLoading() {
         var { startLoading = () => {} } = this.config;
@@ -103,7 +109,7 @@ export default class Mapinator {
         serviceContainer.get('map').fitBounds( bounds );
     }
 
-    createServiceContainer({ storesUrl, storesComparator, parseResponse = (resp) => resp }) {
+    createServiceContainer({ storesUrl, storesComparator, parseRequest = (req) => req, parseResponse = (resp) => resp }) {
         var ServiceContainer = AbstractServiceContainer.extend({
             comparator: storesComparator,
             getLocation: function() {
@@ -152,9 +158,6 @@ export default class Mapinator {
             },
             {
                 url: storesUrl,
-                normalizeRequestData: function( requestData ) {
-                    return requestData;
-                },
                 parseResponse
             }
         );

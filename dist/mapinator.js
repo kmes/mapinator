@@ -17860,6 +17860,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _jquery = require('jquery');
@@ -17906,7 +17908,6 @@ var Mapinator = function () {
 
         this.serviceContainer = this.createServiceContainer(config);
         this.serviceContainer.set('jQuery', $);
-        //this.bindServiceContainer( this.serviceContainer );
 
         this.addressView = this.createAddressView(config, this.serviceContainer);
 
@@ -17944,7 +17945,7 @@ var Mapinator = function () {
         }
     }, {
         key: 'refreshStores',
-        value: function refreshStores(location) {
+        value: function refreshStores(options) {
             var _this2 = this;
 
             var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
@@ -17957,7 +17958,13 @@ var Mapinator = function () {
                 _this2.hideLoading();
             });
 
-            return this.serviceContainer.get('stores').fetchStores(location);
+            return this.serviceContainer.get('stores').fetchStores(_extends({
+                url: typeof this.config.storesUrl === 'function' ? this.config.storesUrl(this.serviceContainer) : this.config.storesUrl
+
+            }, options, {
+
+                data: typeof this.config.parseRequest === 'function' ? this.config.parseRequest(options.data) : options.data
+            }));
         }
     }, {
         key: 'showLoading',
@@ -18013,6 +18020,10 @@ var Mapinator = function () {
         value: function createServiceContainer(_ref) {
             var storesUrl = _ref.storesUrl;
             var storesComparator = _ref.storesComparator;
+            var _ref$parseRequest = _ref.parseRequest;
+            var parseRequest = _ref$parseRequest === undefined ? function (req) {
+                return req;
+            } : _ref$parseRequest;
             var _ref$parseResponse = _ref.parseResponse;
             var parseResponse = _ref$parseResponse === undefined ? function (resp) {
                 return resp;
@@ -18062,9 +18073,6 @@ var Mapinator = function () {
                 StoreModelClassFactory: _StoreModelClassFactory2.default
             }, {
                 url: storesUrl,
-                normalizeRequestData: function normalizeRequestData(requestData) {
-                    return requestData;
-                },
                 parseResponse: parseResponse
             });
         }
@@ -18146,7 +18154,6 @@ var AbstractServiceContainer = function (_Model) {
         var StoreCollectionFactory = _ref.StoreCollectionFactory;
         var StoreModelClassFactory = _ref.StoreModelClassFactory;
         var url = _ref2.url;
-        var normalizeRequestData = _ref2.normalizeRequestData;
         var parseResponse = _ref2.parseResponse;
 
         _classCallCheck(this, AbstractServiceContainer);
@@ -18170,7 +18177,7 @@ var AbstractServiceContainer = function (_Model) {
                 mapLoaded: false
             }
         };
-        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelClassFactory: StoreModelClassFactory }, { url: url, normalizeRequestData: normalizeRequestData, parseResponse: parseResponse }));
+        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelClassFactory: StoreModelClassFactory }, { url: url, parseResponse: parseResponse }));
     }
 
     _createClass(AbstractServiceContainer, [{
@@ -18179,7 +18186,6 @@ var AbstractServiceContainer = function (_Model) {
             var StoreCollectionFactory = _ref3.StoreCollectionFactory;
             var StoreModelClassFactory = _ref3.StoreModelClassFactory;
             var url = _ref4.url;
-            var normalizeRequestData = _ref4.normalizeRequestData;
             var parseResponse = _ref4.parseResponse;
 
             this.set('mapBounds', new google.maps.LatLngBounds());
@@ -18270,6 +18276,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _backbone = require('backbone');
 
 var _backboneFactory = require('../vendor/backboneFactory');
@@ -18283,23 +18291,19 @@ var storeCollection = {
         console.log('initialize', arguments);
     },*/
 
-    fetchStores: function fetchStores(_ref) {
-        var lat = _ref.lat;
-        var lng = _ref.lng;
+    fetchStores: function fetchStores() {
+        var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
         var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 
-        return this.fetch({
-            data: {
-                lat: lat,
-                lng: lng
-            },
+        return this.fetch(_extends({}, options, {
+
             success: function success(data) {
                 callback(data);
             },
             error: function error(_error) {
                 callback(false, _error);
             }
-        });
+        }));
     }
 };
 

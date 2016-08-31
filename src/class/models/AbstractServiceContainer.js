@@ -3,7 +3,7 @@ import { Model } from 'backbone';
 import PlacesAdapter from '../vendor/PlacesAdapter';
 
 export default class AbstractServiceContainer extends Model {
-    constructor( { StoreCollectionFactory, StoreModelClassFactory }, { url, normalizeRequestData, parseResponse } ) {
+    constructor( { StoreCollectionFactory, StoreModelClassFactory }, { url, parseResponse } ) {
         var classProps = {
             defaults: {
                 jQuery: null,
@@ -23,10 +23,10 @@ export default class AbstractServiceContainer extends Model {
                 mapLoaded: false
             }
         };
-        super( classProps, { StoreCollectionFactory, StoreModelClassFactory }, { url, normalizeRequestData, parseResponse });
+        super( classProps, { StoreCollectionFactory, StoreModelClassFactory }, { url, parseResponse });
     }
 
-    initialize( classProps, { StoreCollectionFactory, StoreModelClassFactory }, { url, normalizeRequestData, parseResponse } ) {
+    initialize( classProps, { StoreCollectionFactory, StoreModelClassFactory }, { url, parseResponse } ) {
         this.set( 'mapBounds', new google.maps.LatLngBounds() );
         this.set( 'geocoder', new google.maps.Geocoder() );
 
