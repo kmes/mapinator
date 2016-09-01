@@ -1,20 +1,23 @@
 var config = {
     mapSelector: '#map',
     mapView: null,
-    mapOptions: {
-        zoom: 4,
-        center:  {
-            lat: 41.2053167,
-            lng: 8.085248
-        },
-        mapTypeControl: false,
-        streetViewControl: false,
-        scrollwheel: false
+    address: 'Italia',
+    mapLocation:  {
+        lat: 41.9027835,
+        lng: 12.4963655
     },
-    addresstext: 'Italia',
-    mapLocation: {
-        lat: 41.2053167,
-        lng: 8.085248
+    mapZoom: 10,
+    mapControls: {
+        'mapTypeControl': false,
+        'navigationControl': false,
+        'scrollwheel': false,
+        'streetViewControl': false,
+        'panControl': false,
+        'zoomControl': false,
+        'scaleControl': true,
+        'overviewMapControl': false,
+        'disableDoubleClickZoom': false,
+        'draggable': true
     },
     getMapLocation: function() {
         return this.mapLocation;
@@ -30,7 +33,7 @@ var config = {
     storePanelContainer: null,
 
     storeMarkerIcon: '.marker-prototype .marker-store',
-    getStoreIconPath: function() {
+    iconPath: function() {
         return jQuery( this.storeMarkerIcon ).attr('src');
     },
 
@@ -38,7 +41,8 @@ var config = {
 
     serviceContainer: null,
 
-    storesUrl: '/ajax/store/list',
+    //storesUrl: 'http://www.maxizoo.local'+'/ajax/store/list',
+    storesUrl: '/stores.json',
 
     storesContainer: '.stores-container',
     storeProto: '.store-prototype > *',
@@ -50,9 +54,104 @@ var config = {
     extraClosingRow: '.extra-closing-row'
 };
 
+jQuery('.cancel-address').on('click', function( evt ) {
+    jQuery('#addressSearch').val('');
+});
 
-var mapinator = new Mapinator( config );
+
+var mapinator = new Mapinator({
+    storesUrl: function( serviceContainer ) {
+        console.log('url', this, arguments);
+        return '/stores.json';
+    },
+    parseRequest: function( request ) {
+        //return null;
+        return request;
+    },
+    parseResponse: function( response ) {
+        return response.collections.map(function( data ) {
+            return {
+                id: data.id,
+                title: data.title,
+                lat: parseFloat( data.lat ),
+                lng: parseFloat( data.lng ),
+                phone: data.phone,
+                sanitizedPhone: (function( phone ) { return phone; })( data.phone ),
+                street: data.street,
+                distance: data.distance || '',
+                indication: data.indication,
+                calendar: data.hours,
+                extraCalendar: data.extrahours
+            };
+        });
+    },
+    storesComparator: 'distance',
+    mapSelector: '#map',
+    addressSelector: '#addressSearch',
+    address: 'Italia',
+    mapLocation:  {
+        lat: 41.9027835,
+        lng: 12.4963655
+    },
+    mapZoom: 10,
+    mapControls: {
+        'mapTypeControl': false,
+        'navigationControl': false,
+        'scrollwheel': false,
+        'streetViewControl': false,
+        'panControl': false,
+        'zoomControl': true,
+        'scaleControl': true,
+        'overviewMapControl': false,
+        'disableDoubleClickZoom': false,
+        'draggable': true
+    },
+    iconPath: function() {
+        return jQuery( config.storeMarkerIcon ).attr('src');
+    },
+    infoWindow: function( data ) {
+        if( !data ) return false;
+
+        var $info = jQuery( config.infoWindowProto ).clone(true, true);
+
+        $info.removeClass('hidden');
+
+        $info.find('.title').html( data.title );
+        $info.find('.street').html( data.street );
+
+        var phone = data.phone && data.phone.trim() ? $info.find('.phone').html() + data.phone : '';
+        $info.find('.phone').html( phone );
+
+
+        var href = $info.find('.link-hours').attr('href');
+        $info.find('.link-hours').attr('href', href+data.id);
+
+        return jQuery('<div></div>').append( $info ).html();
+    },
+});
 
 console.log( mapinator );
+
+mapinator.serviceContainer.once('change:mapLoaded', function( serviceContainer, mapLoaded ) {
+    var mapLocation = serviceContainer.get('mapLocation');
+    mapinator.refreshStores( { data: mapLocation }, () => {
+        mapinator.fitMapToMarkers();
+
+        serviceContainer.on('change:mapLocation', function( serviceContainer, mapLocation ) {
+            console.log('change:mapLocation', mapLocation);
+
+            mapinator.refreshStores( { data: mapLocation }, ( stores ) => {
+                mapinator.fitMapToNearestMarkers( 2, mapLocation );
+            });
+        });
+    });
+});
+
+mapinator.serviceContainer.on('change:mapBounds', function( serviceContainer, mapBounds ) {
+    console.log('change:mapBounds', mapBounds);
+    //todo: mostra storePanel
+});
+
+
 
 
