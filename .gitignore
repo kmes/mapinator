@@ -6,6 +6,5 @@ npm-debug.log
 **/.DS_Store
 */.DS_Store
 
-dist/*
-dist/**
-dist/**/*.*
+dist/demo
+dist/stores.json
