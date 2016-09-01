@@ -8,6 +8,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _backbone = require('backbone');
 
+var _backbone2 = _interopRequireDefault(_backbone);
+
 var _backboneFactory = require('../vendor/backboneFactory');
 
 var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
@@ -35,4 +37,4 @@ var storeCollection = {
     }
 };
 
-exports.default = (0, _backboneFactory2.default)(storeCollection, _backbone.Collection);
+exports.default = (0, _backboneFactory2.default)(storeCollection, _backbone2.default.Collection);

@@ -1,4 +1,4 @@
-import { View } from 'backbone';
+import Backbone from 'backbone';
 
 import PlacesBloodhoundEngine from '../vendor/PlacesBloodhoundEngine';
 //import PlacesAdapter from '../vendor/PlacesAdapter';
@@ -69,4 +69,4 @@ const addressView = {
     }
 };
 
-export default backboneFactory( addressView, View );
+export default backboneFactory( addressView, Backbone.View );

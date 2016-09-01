@@ -1,4 +1,4 @@
-import { Model } from 'backbone';
+import Backbone from 'backbone';
 
 import backboneFactory from '../vendor/backboneFactory';
 
@@ -9,4 +9,4 @@ const storeModel = {
      }*/
 };
 
-export default backboneFactory( storeModel, Model );
+export default backboneFactory( storeModel, Backbone.Model );

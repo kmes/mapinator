@@ -18135,6 +18135,8 @@ exports.AbstractServiceContainerClassFactory = AbstractServiceContainerClassFact
 
 var _backbone = require('backbone');
 
+var _backbone2 = _interopRequireDefault(_backbone);
+
 var _PlacesAdapter = require('../vendor/PlacesAdapter');
 
 var _PlacesAdapter2 = _interopRequireDefault(_PlacesAdapter);
@@ -18147,8 +18149,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var AbstractServiceContainer = function (_Model) {
-    _inherits(AbstractServiceContainer, _Model);
+var AbstractServiceContainer = function (_Backbone$Model) {
+    _inherits(AbstractServiceContainer, _Backbone$Model);
 
     function AbstractServiceContainer(_ref, _ref2) {
         var StoreCollectionFactory = _ref.StoreCollectionFactory;
@@ -18262,7 +18264,7 @@ var AbstractServiceContainer = function (_Model) {
     }]);
 
     return AbstractServiceContainer;
-}(_backbone.Model);
+}(_backbone2.default.Model);
 
 exports.default = AbstractServiceContainer;
 function AbstractServiceContainerClassFactory() {
@@ -18279,6 +18281,8 @@ Object.defineProperty(exports, "__esModule", {
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _backbone = require('backbone');
+
+var _backbone2 = _interopRequireDefault(_backbone);
 
 var _backboneFactory = require('../vendor/backboneFactory');
 
@@ -18307,7 +18311,7 @@ var storeCollection = {
     }
 };
 
-exports.default = (0, _backboneFactory2.default)(storeCollection, _backbone.Collection);
+exports.default = (0, _backboneFactory2.default)(storeCollection, _backbone2.default.Collection);
 
 },{"../vendor/backboneFactory":14,"backbone":1}],9:[function(require,module,exports){
 'use strict';
@@ -18317,6 +18321,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _backbone = require('backbone');
+
+var _backbone2 = _interopRequireDefault(_backbone);
 
 var _backboneClassFactory = require('../vendor/backboneClassFactory');
 
@@ -18330,7 +18336,7 @@ var storeModel = {
    }*/
 };
 
-exports.default = (0, _backboneClassFactory2.default)(storeModel, _backbone.Model);
+exports.default = (0, _backboneClassFactory2.default)(storeModel, _backbone2.default.Model);
 
 },{"../vendor/backboneClassFactory":13,"backbone":1}],10:[function(require,module,exports){
 'use strict';
@@ -19033,33 +19039,6 @@ var PlacesAdapter = function () {
                 callback(suggestions, status);
             });
         }
-        /*search( query, callback = () => {} ) {
-            this.geocoder.geocode(
-                {
-                    address: query,
-                    componentRestrictions: {
-                        country: 'it'
-                    }
-                },
-                function( results, status ) {
-                    if( status !== 'OK' || !results.length ) {
-                        callback( false );
-                        return false;
-                    }
-                     var normalizedResults = results.map(function( result ) {
-                        return {
-                            ...result,
-                            id: result['place_id'],
-                            description: result['formatted_address'],
-                            lat: result.geometry.location.lat(),
-                            lng: result.geometry.location.lng()
-                        };
-                    });
-                     callback( normalizedResults );
-                }
-            );
-        }*/
-
     }, {
         key: 'fetchLatLng',
         value: function fetchLatLng(options) {
@@ -19237,6 +19216,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _backbone = require('backbone');
 
+var _backbone2 = _interopRequireDefault(_backbone);
+
 var _PlacesBloodhoundEngine = require('../vendor/PlacesBloodhoundEngine');
 
 var _PlacesBloodhoundEngine2 = _interopRequireDefault(_PlacesBloodhoundEngine);
@@ -19313,7 +19294,7 @@ var addressView = {
     }
 };
 
-exports.default = (0, _backboneFactory2.default)(addressView, _backbone.View);
+exports.default = (0, _backboneFactory2.default)(addressView, _backbone2.default.View);
 
 },{"../vendor/PlacesBloodhoundEngine":12,"../vendor/backboneFactory":14,"../vendor/typeaheadFactory":15,"backbone":1}],17:[function(require,module,exports){
 'use strict';
@@ -19323,6 +19304,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _backbone = require('backbone');
+
+var _backbone2 = _interopRequireDefault(_backbone);
 
 var _backboneFactory = require('../vendor/backboneFactory');
 
@@ -19426,7 +19409,7 @@ var mapView = {
     }
 };
 
-exports.default = (0, _backboneFactory2.default)(mapView, _backbone.View);
+exports.default = (0, _backboneFactory2.default)(mapView, _backbone2.default.View);
 
 },{"../vendor/backboneFactory":14,"backbone":1}],18:[function(require,module,exports){
 'use strict';

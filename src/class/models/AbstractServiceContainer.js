@@ -1,8 +1,8 @@
-import { Model } from 'backbone';
+import Backbone from 'backbone';
 
 import PlacesAdapter from '../vendor/PlacesAdapter';
 
-export default class AbstractServiceContainer extends Model {
+export default class AbstractServiceContainer extends Backbone.Model {
     constructor( { StoreCollectionFactory, StoreModelClassFactory }, { url, parseResponse } ) {
         var classProps = {
             defaults: {

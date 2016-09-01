@@ -1,4 +1,4 @@
-import { View } from 'backbone';
+import Backbone from 'backbone';
 
 import backboneFactory from '../vendor/backboneFactory';
 
@@ -80,4 +80,4 @@ const mapView = {
     }
 };
 
-export default backboneFactory( mapView, View );
+export default backboneFactory( mapView, Backbone.View );

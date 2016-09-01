@@ -20,35 +20,6 @@ export default class PlacesAdapter {
             }
         );
     }
-    /*search( query, callback = () => {} ) {
-        this.geocoder.geocode(
-            {
-                address: query,
-                componentRestrictions: {
-                    country: 'it'
-                }
-            },
-            function( results, status ) {
-                if( status !== 'OK' || !results.length ) {
-                    callback( false );
-                    return false;
-                }
-
-                var normalizedResults = results.map(function( result ) {
-                    return {
-                        ...result,
-                        id: result['place_id'],
-                        description: result['formatted_address'],
-                        lat: result.geometry.location.lat(),
-                        lng: result.geometry.location.lng()
-                    };
-                });
-
-                callback( normalizedResults );
-            }
-        );
-    }*/
-
 
     fetchLatLng( options, callback = () => {}) {
         this.geocoder.geocode( options, function( results, status ) {

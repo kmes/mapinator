@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _backbone = require('backbone');
 
+var _backbone2 = _interopRequireDefault(_backbone);
+
 var _backboneFactory = require('../vendor/backboneFactory');
 
 var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
@@ -108,4 +110,4 @@ var mapView = {
     }
 };
 
-exports.default = (0, _backboneFactory2.default)(mapView, _backbone.View);
+exports.default = (0, _backboneFactory2.default)(mapView, _backbone2.default.View);

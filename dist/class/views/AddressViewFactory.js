@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _backbone = require('backbone');
 
+var _backbone2 = _interopRequireDefault(_backbone);
+
 var _PlacesBloodhoundEngine = require('../vendor/PlacesBloodhoundEngine');
 
 var _PlacesBloodhoundEngine2 = _interopRequireDefault(_PlacesBloodhoundEngine);
@@ -82,4 +84,4 @@ var addressView = {
     }
 };
 
-exports.default = (0, _backboneFactory2.default)(addressView, _backbone.View);
+exports.default = (0, _backboneFactory2.default)(addressView, _backbone2.default.View);

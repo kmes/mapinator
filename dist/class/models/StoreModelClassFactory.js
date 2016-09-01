@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _backbone = require('backbone');
 
+var _backbone2 = _interopRequireDefault(_backbone);
+
 var _backboneClassFactory = require('../vendor/backboneClassFactory');
 
 var _backboneClassFactory2 = _interopRequireDefault(_backboneClassFactory);
@@ -18,4 +20,4 @@ var storeModel = {
    }*/
 };
 
-exports.default = (0, _backboneClassFactory2.default)(storeModel, _backbone.Model);
+exports.default = (0, _backboneClassFactory2.default)(storeModel, _backbone2.default.Model);

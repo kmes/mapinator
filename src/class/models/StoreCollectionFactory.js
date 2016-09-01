@@ -1,4 +1,4 @@
-import { Collection } from 'backbone';
+import Backbone from 'backbone';
 
 import backboneFactory from '../vendor/backboneFactory';
 
@@ -21,4 +21,4 @@ const storeCollection =  {
     }
 }
 
-export default backboneFactory( storeCollection, Collection );
+export default backboneFactory( storeCollection, Backbone.Collection );
