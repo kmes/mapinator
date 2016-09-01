@@ -1,4 +1,4 @@
-import Bloodhound from "typeahead.js/dist/bloodhound";
+//import Bloodhound from "typeahead.js/dist/bloodhound";
 
 export default class PlacesBloodhoundEngine extends Bloodhound {
     constructor( options = {} ) {

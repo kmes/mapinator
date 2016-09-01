@@ -1,4 +1,4 @@
-import Backbone from 'backbone';
+//import Backbone from 'backbone';
 
 import backboneClassFactory from '../vendor/backboneClassFactory';
 

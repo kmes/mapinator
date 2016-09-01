@@ -4,10 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _backbone = require('backbone');
-
-var _backbone2 = _interopRequireDefault(_backbone);
-
 var _PlacesBloodhoundEngine = require('../vendor/PlacesBloodhoundEngine');
 
 var _PlacesBloodhoundEngine2 = _interopRequireDefault(_PlacesBloodhoundEngine);
@@ -82,6 +78,6 @@ var addressView = {
                 break;
         }
     }
-};
+}; //import Backbone from 'backbone';
 
-exports.default = (0, _backboneFactory2.default)(addressView, _backbone2.default.View);
+exports.default = (0, _backboneFactory2.default)(addressView, Backbone.View);

@@ -1,4 +1,4 @@
-import Backbone from 'backbone';
+//import Backbone from 'backbone';
 
 import PlacesBloodhoundEngine from '../vendor/PlacesBloodhoundEngine';
 //import PlacesAdapter from '../vendor/PlacesAdapter';

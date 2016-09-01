@@ -1,4 +1,4 @@
-import jQuery from 'jquery';
+//import jQuery from 'jquery';
 
 var $ = window ? window.jQuery || window.$ || (window.jQuery = jQuery) : jQuery;
 

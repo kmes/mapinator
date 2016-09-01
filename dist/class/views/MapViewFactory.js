@@ -4,10 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _backbone = require('backbone');
-
-var _backbone2 = _interopRequireDefault(_backbone);
-
 var _backboneFactory = require('../vendor/backboneFactory');
 
 var _backboneFactory2 = _interopRequireDefault(_backboneFactory);
@@ -108,6 +104,6 @@ var mapView = {
     removeAllMarkers: function removeAllMarkers(easyMap) {
         easyMap.removeAllMarker();
     }
-};
+}; //import Backbone from 'backbone';
 
-exports.default = (0, _backboneFactory2.default)(mapView, _backbone2.default.View);
+exports.default = (0, _backboneFactory2.default)(mapView, Backbone.View);

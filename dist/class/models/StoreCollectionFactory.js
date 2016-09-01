@@ -4,11 +4,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _backbone = require('backbone');
-
-var _backbone2 = _interopRequireDefault(_backbone);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; //import Backbone from 'backbone';
 
 var _backboneFactory = require('../vendor/backboneFactory');
 
@@ -37,4 +33,4 @@ var storeCollection = {
     }
 };
 
-exports.default = (0, _backboneFactory2.default)(storeCollection, _backbone2.default.Collection);
+exports.default = (0, _backboneFactory2.default)(storeCollection, Backbone.Collection);

@@ -1,5 +1,5 @@
 export default function typeaheadFactory( selector, options = {} ) {
-    require('typeahead.js');
+    //require('typeahead.js');
 
     var $input = jQuery( selector );
 

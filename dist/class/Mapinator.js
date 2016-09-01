@@ -8,10 +8,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _jquery = require('jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
 var _EasyMaps = require('./vendor/EasyMaps.js');
 
 var _EasyMaps2 = _interopRequireDefault(_EasyMaps);
@@ -40,7 +36,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var $ = window ? window.jQuery || window.$ || (window.jQuery = _jquery2.default) : _jquery2.default;
+//import jQuery from 'jquery';
+
+var $ = window ? window.jQuery || window.$ || (window.jQuery = jQuery) : jQuery;
 
 var Mapinator = function () {
     function Mapinator(config) {
