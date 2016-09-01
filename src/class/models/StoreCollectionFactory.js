@@ -1,4 +1,4 @@
-import { Collection } from 'backbone';
+//import Backbone from 'backbone';
 
 import backboneFactory from '../vendor/backboneFactory';
 
@@ -7,12 +7,10 @@ const storeCollection =  {
         console.log('initialize', arguments);
     },*/
 
-    fetchStores: function( location, callback = () => {} ) {
+    fetchStores: function( options = {}, callback = () => {} ) {
         return this.fetch({
-            data: {
-                lat: location.lat,
-                lng: location.lng
-            },
+            ...options,
+
             success: function( data ) {
                 callback( data );
             },
@@ -23,4 +21,4 @@ const storeCollection =  {
     }
 }
 
-export default backboneFactory( storeCollection, Collection );
+export default backboneFactory( storeCollection, Backbone.Collection );

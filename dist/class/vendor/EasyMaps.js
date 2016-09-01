@@ -1,21 +1,28 @@
+'use strict';
 
-function EasyMaps( properties ) {
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+function EasyMaps(properties) {
     var that = this;
 
     this.$ = properties.jQuery || jQuery;
 
     var config = properties || {};
-    if( !config.center ) {
+    if (!config.center) {
         config.center = {
             lat: 0,
             lng: 0
         };
     }
 
-    if( !config.center.lat ) {
+    if (!config.center.lat) {
         config.center.lat = 0;
     }
-    if( !config.center.lng ) {
+    if (!config.center.lng) {
         config.center.lng = 0;
     }
 
@@ -27,23 +34,23 @@ function EasyMaps( properties ) {
     that.bounds = null;
 
     that.eventListener = {
-        onLoaded: function() {}
+        onLoaded: function onLoaded() {}
     };
 
-    for( var evt in that.eventListener ) {
-        if( config[ evt ] ) {
-            that.addEventListener( evt, config[ evt ] );
+    for (var evt in that.eventListener) {
+        if (config[evt]) {
+            that.addEventListener(evt, config[evt]);
         }
     }
 
     that.mapSettings = config.mapSettings || {
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-    if( !that.mapSettings.mapTypeId ) {
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    if (!that.mapSettings.mapTypeId) {
         that.mapSettings.mapTypeId = google.maps.MapTypeId.ROADMAP;
     }
 
-    if( config.noControls ) {
+    if (config.noControls) {
 
         that.mapSettings['mapTypeControl'] = false;
         that.mapSettings['navigationControl'] = false;
@@ -59,17 +66,15 @@ function EasyMaps( properties ) {
 
         that.mapSettings['disableDoubleClickZoom'] = true;
         that.mapSettings['draggable'] = false;
-
     }
 
-    if( config.controls ) {
+    if (config.controls) {
 
-        if( typeof config.controls === 'object' ) {
-            for( var name in config.controls ) {
-                that.mapSettings[ name ] = config.controls[ name ];
+        if (_typeof(config.controls) === 'object') {
+            for (var name in config.controls) {
+                that.mapSettings[name] = config.controls[name];
             }
         }
-
     }
 
     that.markerSettings = {
@@ -91,47 +96,44 @@ function EasyMaps( properties ) {
     that.clusterList = [];
     that.clusterObjList = [];
     that.clusterGridRule = {};
-    for(var i=1; i<=22; i++) {
-        that.clusterGridRule[ i ] = i * 2;
+    for (var i = 1; i <= 22; i++) {
+        that.clusterGridRule[i] = i * 2;
     }
 
     that.circleList = [];
     that.circleObjList = [];
 
-    if( !config.elem && !config.map ) return;
+    if (!config.elem && !config.map) return;
 
     that.resetBounds();
 
-    if( config.elem ) that.setDomElem( config.elem, false );
-    that.setCenter( config.center.lat, config.center.lng, false );
-    that.setZoom( config.zoom, false );
+    if (config.elem) that.setDomElem(config.elem, false);
+    that.setCenter(config.center.lat, config.center.lng, false);
+    that.setZoom(config.zoom, false);
 
-    that.initMap( config.map );
+    that.initMap(config.map);
 };
 
-EasyMaps.prototype.addEventListener = function( event, fnHandler ) {
+EasyMaps.prototype.addEventListener = function (event, fnHandler) {
     var that = this;
 
-    if( that.eventListener[ event ] && typeof fnHandler === 'function' ) {
-        that.eventListener[ event ] = fnHandler;
+    if (that.eventListener[event] && typeof fnHandler === 'function') {
+        that.eventListener[event] = fnHandler;
         return true;
-    }
-    else {
+    } else {
         return false;
     }
-
 };
 
-EasyMaps.prototype.onLoaded = function( fnHandler ) {
+EasyMaps.prototype.onLoaded = function (fnHandler) {
     var that = this;
 
     var eventName = 'onLoaded';
 
-    return that.addEventListener( eventName, fnHandler );
-
+    return that.addEventListener(eventName, fnHandler);
 };
 
-EasyMaps.prototype.resetBounds = function() {
+EasyMaps.prototype.resetBounds = function () {
     var that = this;
 
     that.bounds = new google.maps.LatLngBounds();
@@ -139,66 +141,63 @@ EasyMaps.prototype.resetBounds = function() {
     return that.bounds;
 };
 
-EasyMaps.prototype.setDomElem = function( elem ) {
-    return this.domElem = elem instanceof HTMLElement ? elem : document.querySelector( elem );
+EasyMaps.prototype.setDomElem = function (elem) {
+    return this.domElem = elem instanceof HTMLElement ? elem : document.querySelector(elem);
 };
 
-EasyMaps.prototype.getCenter = function() {
+EasyMaps.prototype.getCenter = function () {
     var that = this;
 
     return that.center;
 };
-EasyMaps.prototype.setCenter = function( lat, lng, render ) {
+EasyMaps.prototype.setCenter = function (lat, lng, render) {
     var that = this;
     render = typeof render !== 'undefined' ? render : true;
     that.center = {
-        lat: parseFloat( lat ),
-        lng: parseFloat( lng )
+        lat: parseFloat(lat),
+        lng: parseFloat(lng)
     };
 
-    if( render ) {
+    if (render) {
         //set center on map
-        that.mapObj.setCenter( new google.maps.LatLng( that.center.lat, that.center.lng ) );
+        that.mapObj.setCenter(new google.maps.LatLng(that.center.lat, that.center.lng));
         return that.mapObj;
-    }
-    else {
+    } else {
         return that.center;
     }
-
 };
-EasyMaps.prototype.getZoom = function() {
+EasyMaps.prototype.getZoom = function () {
     var that = this;
 
     return that.mapObj.getZoom();
 };
-EasyMaps.prototype.setZoom = function( zoomNumb, render ) {
-    if( !zoomNumb ) return false;
+EasyMaps.prototype.setZoom = function (zoomNumb, render) {
+    if (!zoomNumb) return false;
     var that = this;
     render = typeof render !== 'undefined' ? render : true;
-    that.zoom = parseInt( zoomNumb );
+    that.zoom = parseInt(zoomNumb);
 
-    if( render ) {
+    if (render) {
         //set zoom on map
-        that.mapObj.setZoom( that.zoom );
+        that.mapObj.setZoom(that.zoom);
         return that.mapObj;
-    }
-    else {
+    } else {
         return that.zoom;
     }
 };
-EasyMaps.prototype.fitCenterZoomToMarkers = function( render ) {
+EasyMaps.prototype.fitCenterZoomToMarkers = function (render) {
     var that = this;
     render = typeof render !== 'undefined' ? render : true;
 
     var area = null;
 
     var markers = that.markerObjList;
-    for( var n in markers ) {
-        var pos = markers[ n ].getPosition();
+    for (var n in markers) {
+        var pos = markers[n].getPosition();
         var lat = pos.lat();
         var lng = pos.lng();
 
-        if( !area ) {
+        if (!area) {
             area = {
                 'x1': lat,
                 'x2': lat,
@@ -213,7 +212,7 @@ EasyMaps.prototype.fitCenterZoomToMarkers = function( render ) {
         area['y2'] = lng > area['y2'] ? lng : area['y2'];
     }
 
-    if( !area ) {
+    if (!area) {
         area = {
             'x1': that.center.lat,
             'x2': that.center.lat,
@@ -224,16 +223,15 @@ EasyMaps.prototype.fitCenterZoomToMarkers = function( render ) {
 
     that.resetBounds();
 
-    that.bounds.extend( new google.maps.LatLng( area['x1'], area['y1'] ) );
+    that.bounds.extend(new google.maps.LatLng(area['x1'], area['y1']));
     //that.bounds.extend( new google.maps.LatLng( area['x2'], area['y1'] ) );
     //that.bounds.extend( new google.maps.LatLng( area['x1'], area['y2'] ) );
-    that.bounds.extend( new google.maps.LatLng( area['x2'], area['y2'] ) );
+    that.bounds.extend(new google.maps.LatLng(area['x2'], area['y2']));
 
+    var oldCenter = that.center;
+    var oldZoom = that.zoom;
 
-    var oldCenter 	= that.center;
-    var oldZoom 	= that.zoom;
-
-    that.mapObj.fitBounds( that.bounds );
+    that.mapObj.fitBounds(that.bounds);
 
     var actualCenter = that.mapObj.getCenter();
     var newCenter = {
@@ -242,22 +240,21 @@ EasyMaps.prototype.fitCenterZoomToMarkers = function( render ) {
     };
     var newZoom = that.mapObj.getZoom();
 
-    if( render ) {
+    if (render) {
         that.center = newCenter;
         that.zoom = newZoom;
-    }
-    else {
-        that.setCenter( oldCenter );
-        that.setZoom( oldZoom );
+    } else {
+        that.setCenter(oldCenter);
+        that.setZoom(oldZoom);
     }
 };
-EasyMaps.prototype.initMap = function( map ) {
+EasyMaps.prototype.initMap = function (map) {
     var that = this;
 
     var options = that.mapSettings;
 
-    options['center'] 	= new google.maps.LatLng( that.center.lat, that.center.lng );
-    options['zoom'] 	= that.zoom;
+    options['center'] = new google.maps.LatLng(that.center.lat, that.center.lng);
+    options['zoom'] = that.zoom;
 
     /*var options = {
      zoom: that.zoom,
@@ -265,23 +262,22 @@ EasyMaps.prototype.initMap = function( map ) {
      mapTypeId: google.maps.MapTypeId.ROADMAP
      };*/
 
-    that.mapObj = map || new google.maps.Map( that.domElem, options );
+    that.mapObj = map || new google.maps.Map(that.domElem, options);
 
-    google.maps.event.addListenerOnce( that.mapObj, 'idle', function() {
+    google.maps.event.addListenerOnce(that.mapObj, 'idle', function () {
         that.eventListener['onLoaded']();
     });
 
     return that.mapObj;
 };
 
-
-EasyMaps.prototype.addMarker = function( markerData, render, clusterData, callback ) {
+EasyMaps.prototype.addMarker = function (markerData, render, clusterData, callback) {
     var that = this;
 
-    if( !callback ) callback = function() {};
+    if (!callback) callback = function callback() {};
 
     render = typeof render !== "undefined" ? render : true;
-    var markerList = typeof markerData.length !== 'undefined' ? markerData : [ markerData ];
+    var markerList = typeof markerData.length !== 'undefined' ? markerData : [markerData];
     //var markerList = markerData[0] ? markerData : [ markerData ];
 
     //options - OK
@@ -295,64 +291,56 @@ EasyMaps.prototype.addMarker = function( markerData, render, clusterData, callba
      callback();
      });*/
 
+    google.maps.event.addDomListener(that.mapObj, 'idle', function () {
+        clearTimeout(that.markerTimer);
+        that.markerTimer = setTimeout(function () {
+            google.maps.event.clearListeners(that.mapObj, 'idle');
 
-    google.maps.event.addDomListener( that.mapObj, 'idle', function() {
-        clearTimeout( that.markerTimer );
-        that.markerTimer = setTimeout(function() {
-            google.maps.event.clearListeners( that.mapObj, 'idle');
-
-            setTimeout(function() {
+            setTimeout(function () {
                 callback();
             }, 400);
-
         }, 400);
     });
 
     var markerGroup = [];
 
-    for( var n in markerList ) {
-        that.markerList.push( markerList[ n ] );
+    for (var n in markerList) {
+        that.markerList.push(markerList[n]);
         var pos = {
-            lat: parseFloat( markerList[ n ]['position']['lat'] ),
-            lng: parseFloat( markerList[ n ]['position']['lng'] )
+            lat: parseFloat(markerList[n]['position']['lat']),
+            lng: parseFloat(markerList[n]['position']['lng'])
         };
-        var posObj = new google.maps.LatLng( pos.lat, pos.lng );
+        var posObj = new google.maps.LatLng(pos.lat, pos.lng);
         var markerConf = {
             position: posObj,
             map: that.mapObj
         };
 
-
-        if( markerList[ n ]['icon'] ) {
-            var iconData = markerList[ n ]['icon'];
-            if( iconData['path'] ) {
+        if (markerList[n]['icon']) {
+            var iconData = markerList[n]['icon'];
+            if (iconData['path']) {
                 markerConf['icon'] = {
                     //anchor: new google.maps.Point( -16, -16 ),
-                    scaledSize: new google.maps.Size(
-                        iconData['w'] || that.markerSettings.w,
-                        iconData['h'] || that.markerSettings.h,
-                        iconData['unit'] || that.markerSettings.unit,
-                        iconData['unit'] || that.markerSettings.unit
-                    ),
+                    scaledSize: new google.maps.Size(iconData['w'] || that.markerSettings.w, iconData['h'] || that.markerSettings.h, iconData['unit'] || that.markerSettings.unit, iconData['unit'] || that.markerSettings.unit),
                     url: iconData['path']
                 };
             }
-            if( iconData['shadow'] ) {
+            if (iconData['shadow']) {
                 markerConf['shadow'] = iconData['shadow'];
             }
-            if( iconData['flat'] ) {
+            if (iconData['flat']) {
                 markerConf['flat'] = !!iconData['flat'];
             }
         }
 
-        if( markerList[ n ]['title'] ) {
-            markerConf['title'] = markerList[ n ]['title'];
+        if (markerList[n]['title']) {
+            markerConf['title'] = markerList[n]['title'];
         }
-        var marker = new google.maps.Marker( markerConf );
+        var marker = new google.maps.Marker(markerConf);
 
-        that.markerObjList.push( marker );
+        that.markerObjList.push(marker);
 
-        markerGroup.push( marker );
+        markerGroup.push(marker);
 
         /*(function( marker ) {
          google.maps.event.addListener( marker, 'mouseover', function(e) {
@@ -365,24 +353,24 @@ EasyMaps.prototype.addMarker = function( markerData, render, clusterData, callba
          });
          })( marker );*/
 
-        if( markerList[ n ]['infoWindow'] ) {
-            var infoWindowData = markerList[ n ]['infoWindow'];
+        if (markerList[n]['infoWindow']) {
+            var infoWindowData = markerList[n]['infoWindow'];
 
-            var openHandler = infoWindowData['open'] || function() {};
+            var openHandler = infoWindowData['open'] || function () {};
 
             var infoWindowConf = {
                 content: infoWindowData['content']
             };
-            var infoWindow = new google.maps.InfoWindow( infoWindowConf );
-            that.infoWindowObjList.push( infoWindow );
+            var infoWindow = new google.maps.InfoWindow(infoWindowConf);
+            that.infoWindowObjList.push(infoWindow);
 
-            (function( marker, infoWindow, openHandler ) {
-                google.maps.event.addListener( marker, 'click', function() {
+            (function (marker, infoWindow, openHandler) {
+                google.maps.event.addListener(marker, 'click', function () {
 
                     that.closeAllInfoWindow();
 
-                    infoWindow.open( that.mapObj, marker );
-                    openHandler( infoWindow, marker );
+                    infoWindow.open(that.mapObj, marker);
+                    openHandler(infoWindow, marker);
                     /*google.maps.event.addListener( marker, 'mouseout', function() {
                      infoWindow.close();
                      google.maps.event.clearListeners( marker, 'mouseout' );
@@ -391,30 +379,25 @@ EasyMaps.prototype.addMarker = function( markerData, render, clusterData, callba
                      google.maps.event.clearListeners( marker, 'mouseout' );
                      });*/
                 });
-
-            })( marker, infoWindow, openHandler );
+            })(marker, infoWindow, openHandler);
         }
-
     }
 
-    if( clusterData ) {
-        that.addCluster( markerGroup, clusterData );
+    if (clusterData) {
+        that.addCluster(markerGroup, clusterData);
     }
-
-
-
 };
 
-EasyMaps.prototype.closeAllInfoWindow = function() {
+EasyMaps.prototype.closeAllInfoWindow = function () {
     var that = this;
 
-    for( var n in that.infoWindowObjList ) {
-        var infoWindow = that.infoWindowObjList[ n ];
+    for (var n in that.infoWindowObjList) {
+        var infoWindow = that.infoWindowObjList[n];
         infoWindow.close();
     }
 };
 
-EasyMaps.prototype.addCluster = function( markerGroup, conf ) {
+EasyMaps.prototype.addCluster = function (markerGroup, conf) {
     var that = this;
 
     conf = conf || {};
@@ -424,35 +407,32 @@ EasyMaps.prototype.addCluster = function( markerGroup, conf ) {
         gridSize: conf.size || 10
     };
 
-    if( conf.icon ) {
+    if (conf.icon) {
         clusterConf['styles'] = [{
-            url: 		conf.icon,
-            width: 		conf.width || 50,
-            height: 	conf.height || 50,
-            anchor: 	conf.anchor || [3, 0],
-            textSize: 	conf.textSize || 10,
-            textColor:	conf.textColor || '#000'
+            url: conf.icon,
+            width: conf.width || 50,
+            height: conf.height || 50,
+            anchor: conf.anchor || [3, 0],
+            textSize: conf.textSize || 10,
+            textColor: conf.textColor || '#000'
         }];
     }
 
-    var cluster = new MarkerClusterer( that.mapObj, markerGroup, clusterConf );
+    var cluster = new MarkerClusterer(that.mapObj, markerGroup, clusterConf);
 
     var clusterData = {
         'conf': clusterConf,
-        'markerGroup': markerGroup,
-        //'gridRule': conf.gridRule || that.clusterGridRule
+        'markerGroup': markerGroup
     };
 
-    that.clusterList.push( clusterData );
-    that.clusterObjList.push( cluster );
+    that.clusterList.push(clusterData);
+    that.clusterObjList.push(cluster);
 
     /*(function( cluster, clusterData ) {
      google.maps.event.addListener( that.mapObj, 'zoom_changed', function() {
      var gridZoomMatch = clusterData.gridRule;
-
-     var zoom = that.mapObj.getZoom();
-
-     for( var maxZoom in gridZoomMatch ) {
+      var zoom = that.mapObj.getZoom();
+      for( var maxZoom in gridZoomMatch ) {
      if( zoom <= maxZoom ) {
      zoom = maxZoom;
      }
@@ -467,13 +447,13 @@ EasyMaps.prototype.addCluster = function( markerGroup, conf ) {
      })( cluster, clusterData );*/
 };
 
-EasyMaps.prototype.removeAllCluster = function( render ) {
+EasyMaps.prototype.removeAllCluster = function (render) {
     var that = this;
 
     render = typeof render !== "undefined" ? render : true;
 
     that.clusterList = [];
-    if( render ) {
+    if (render) {
         for (var n in that.clusterObjList) {
             //that.clusterObjList[ n ].setMap( null );
         }
@@ -481,25 +461,25 @@ EasyMaps.prototype.removeAllCluster = function( render ) {
     }
 };
 
-EasyMaps.prototype.removeAllMarker = function( render ) {
+EasyMaps.prototype.removeAllMarker = function (render) {
     var that = this;
 
     render = typeof render !== "undefined" ? render : true;
 
     that.markerList = [];
-    if( render ) {
-        for( var n in that.markerObjList ) {
-            that.markerObjList[ n ].setMap( null );
+    if (render) {
+        for (var n in that.markerObjList) {
+            that.markerObjList[n].setMap(null);
         }
         that.markerObjList = [];
 
         that.infoWindowObjList = [];
     }
 
-    that.removeAllCluster( render );
+    that.removeAllCluster(render);
 };
 
-EasyMaps.prototype.addCircle = function( circleData, render ) {
+EasyMaps.prototype.addCircle = function (circleData, render) {
     var that = this;
 
     render = typeof render !== "undefined" ? render : true;
@@ -511,15 +491,15 @@ EasyMaps.prototype.addCircle = function( circleData, render ) {
 
     var radiusAmp = 1;
 
-    var circleList = typeof circleData.length !== 'undefined' ? circleData : [ circleData ];
-    for( var n in circleList ) {
-        that.circleList.push( circleList[ n ] );
+    var circleList = typeof circleData.length !== 'undefined' ? circleData : [circleData];
+    for (var n in circleList) {
+        that.circleList.push(circleList[n]);
         var pos = {
-            lat: parseFloat( circleList[ n ]['position']['lat'] ),
-            lng: parseFloat( circleList[ n ]['position']['lng'] )
+            lat: parseFloat(circleList[n]['position']['lat']),
+            lng: parseFloat(circleList[n]['position']['lng'])
         };
-        var posObj = new google.maps.LatLng( pos.lat, pos.lng );
-        var radius = parseInt( circleList[ n ]['radius'] ) * radiusAmp;
+        var posObj = new google.maps.LatLng(pos.lat, pos.lng);
+        var radius = parseInt(circleList[n]['radius']) * radiusAmp;
 
         var circleConf = {
             center: posObj,
@@ -527,105 +507,99 @@ EasyMaps.prototype.addCircle = function( circleData, render ) {
             radius: radius
         };
 
-        for( var style in cirleStyleList ) {
-            if( circleList[ n ][ style ] ) {
-                var strokeData = circleList[ n ][ style ];
-                for( var type in strokeData  ) {
-                    var confName = style+type.substr(0, 1).toUpperCase()+type.substr(1);
-                    circleConf[ confName ] = strokeData[ type ];
+        for (var style in cirleStyleList) {
+            if (circleList[n][style]) {
+                var strokeData = circleList[n][style];
+                for (var type in strokeData) {
+                    var confName = style + type.substr(0, 1).toUpperCase() + type.substr(1);
+                    circleConf[confName] = strokeData[type];
                 }
             }
         }
 
-        var circle = new google.maps.Circle( circleConf );
-        that.circleObjList.push( circle );
-
+        var circle = new google.maps.Circle(circleConf);
+        that.circleObjList.push(circle);
     }
-
 };
 
-EasyMaps.prototype.removeAllCircle = function( render ) {
+EasyMaps.prototype.removeAllCircle = function (render) {
     var that = this;
 
     render = typeof render !== "undefined" ? render : true;
 
     that.circleList = [];
-    if( render ) {
-        for( var n in that.circleObjList ) {
-            that.circleObjList[ n ].setMap( null );
+    if (render) {
+        for (var n in that.circleObjList) {
+            that.circleObjList[n].setMap(null);
         }
         that.circleObjList = [];
     }
 };
 
-EasyMaps.prototype.autocomplete = function( domElement, fnCallback ) {
+EasyMaps.prototype.autocomplete = function (domElement, fnCallback) {
     var that = this;
 
-    if( !domElement ) {
+    if (!domElement) {
         domElement = this;
-    }
-    else if( typeof domElement === 'function' ) {
+    } else if (typeof domElement === 'function') {
         fnCallback = domElement;
         domElement = this;
-    }
-    else {
-        fnCallback = fnCallback || function() {};
+    } else {
+        fnCallback = fnCallback || function () {};
     }
 
     var pacContainer = '.pac-container';
 
-    var fnFinal = function( place, el ) {
-        fnCallback( place, el );
+    var fnFinal = function fnFinal(place, el) {
+        fnCallback(place, el);
     };
 
     //var defaultCenter = 'Italia';
 
-    var $inputList = that.$( domElement );
-    $inputList.each(function(i, el) {
-        (function(el) {
+    var $inputList = that.$(domElement);
+    $inputList.each(function (i, el) {
+        (function (el) {
             var inputCenter = el;
 
-            var autocomplete = new google.maps.places.Autocomplete( inputCenter, {
+            var autocomplete = new google.maps.places.Autocomplete(inputCenter, {
                 types: ["geocode"],
-                componentRestrictions: {country: 'it'}
+                componentRestrictions: { country: 'it' }
             });
 
             var setPacItem;
 
-            that.$(el).click(function(e) {
+            that.$(el).click(function (e) {
 
-                setTimeout(function() {
+                setTimeout(function () {
                     that.$(e.target).select();
-                    autocomplete.pacContainer = autocomplete.pacContainer || that.$( pacContainer ).filter(':visible');
-
+                    autocomplete.pacContainer = autocomplete.pacContainer || that.$(pacContainer).filter(':visible');
                 }, 200);
 
                 var isChanged = false;
 
-                that.$(el).unbind('keypress blur').bind('keypress blur', function(e) {
-                    var $this = that.$( this );
+                that.$(el).unbind('keypress blur').bind('keypress blur', function (e) {
+                    var $this = that.$(this);
 
-                    if( e.type == 'blur' ) {
-                        if( !isChanged ) {
+                    if (e.type == 'blur') {
+                        if (!isChanged) {
                             return true;
                         }
                         isChanged = false;
-                    }
-                    else {
+                    } else {
                         isChanged = true;
                     }
 
-                    var $pacContainer 	= autocomplete.pacContainer;
-                    var $pacItem 		= $pacContainer.find(".pac-item");
-                    var $firstMatch 	= $pacItem.filter(':first');
+                    var $pacContainer = autocomplete.pacContainer;
+                    var $pacItem = $pacContainer.find(".pac-item");
+                    var $firstMatch = $pacItem.filter(':first');
 
                     //console.log( $firstMatch.length );
 
                     var pacItemSelected = 'pac-item-selected';
 
-                    setTimeout(function() {
-                        $pacItem.removeClass( pacItemSelected );
-                        $firstMatch.addClass( pacItemSelected );
+                    setTimeout(function () {
+                        $pacItem.removeClass(pacItemSelected);
+                        $firstMatch.addClass(pacItemSelected);
                     }, 400);
 
                     if (e.which == 13 || e.type == 'blur') {
@@ -633,63 +607,57 @@ EasyMaps.prototype.autocomplete = function( domElement, fnCallback ) {
 
                         var delay = e.type == 'blur' ? 400 : 400;
 
-                        setPacItem = setTimeout(function() {
+                        setPacItem = setTimeout(function () {
 
                             //$firstMatch = $pacItem.filter('.'+pacItemSelected).length ? $pacItem.filter('.'+pacItemSelected) : $firstMatch;
                             var allText = $firstMatch.text();
                             var lastText = $firstMatch.children('span:last').text();
-                            var firstResult = allText.replace( lastText, ', '+lastText );
+                            var firstResult = allText.replace(lastText, ', ' + lastText);
 
-                            $this.val( firstResult );
-                            $this.attr('value', firstResult );
+                            $this.val(firstResult);
+                            $this.attr('value', firstResult);
 
-                            if( e.type != 'blur' ) {
+                            if (e.type != 'blur') {
                                 //$this.blur();
                             }
 
-                            var t = setInterval(function() {
-                                if( $this.val() != firstResult ) {
-                                    $this.val( firstResult );
-                                    clearInterval( t );
+                            var t = setInterval(function () {
+                                if ($this.val() != firstResult) {
+                                    $this.val(firstResult);
+                                    clearInterval(t);
                                 }
                             }, 200);
 
                             var geocoder = new google.maps.Geocoder();
-                            geocoder.geocode({"address":firstResult }, function( results, status ) {
+                            geocoder.geocode({ "address": firstResult }, function (results, status) {
                                 var place = false;
 
-                                if ( status == google.maps.GeocoderStatus.OK ) {
+                                if (status == google.maps.GeocoderStatus.OK) {
                                     place = results[0];
 
                                     //$firstMatch.addClass( pacItemSelected );
                                     $pacContainer.css("display", "none");
                                 }
                                 //console.log('geocode');
-                                fnFinal( place, el );
+                                fnFinal(place, el);
                             });
-
                         }, delay);
-
                     }
                 });
-
             });
 
-            google.maps.event.addListener( autocomplete, 'place_changed', function() {
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
                 var place = autocomplete.getPlace();
                 //console.log( place );
-                if( place.geometry && place.geometry.location ) {
+                if (place.geometry && place.geometry.location) {
                     that.$(el).unbind('keypress blur');
-                    clearInterval( setPacItem );
+                    clearInterval(setPacItem);
                     //console.log('listener');
-                    fnFinal( place, el );
+                    fnFinal(place, el);
                 }
             });
-
         })(el);
     });
-
-
 };
 
-export default EasyMaps;
+exports.default = EasyMaps;

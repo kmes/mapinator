@@ -1,9 +1,13 @@
-import { Model } from 'backbone';
+//import Backbone from 'backbone';
 
-export default class AbstractServiceContainer extends Model {
-    constructor( { StoreCollectionFactory, StoreModelFactory }, { url, normalizeRequestData, parseResponse } ) {
+import PlacesAdapter from '../vendor/PlacesAdapter';
+
+export default class AbstractServiceContainer extends Backbone.Model {
+    constructor( { StoreCollectionFactory, StoreModelClassFactory }, { url, parseResponse } ) {
         var classProps = {
             defaults: {
+                jQuery: null,
+
                 mapBounds: null,
                 geocoder: null,
 
@@ -15,25 +19,27 @@ export default class AbstractServiceContainer extends Model {
                 mapLocation: {
                     lat: null,
                     lng: null
-                }
+                },
+                mapLoaded: false
             }
         };
-        super( classProps, { StoreCollectionFactory, StoreModelFactory }, { url, normalizeRequestData, parseResponse });
+        super( classProps, { StoreCollectionFactory, StoreModelClassFactory }, { url, parseResponse });
     }
 
-    initialize( classProps, { StoreCollectionFactory, StoreModelFactory }, { url, normalizeRequestData, parseResponse } ) {
+    initialize( classProps, { StoreCollectionFactory, StoreModelClassFactory }, { url, parseResponse } ) {
         this.set( 'mapBounds', new google.maps.LatLngBounds() );
         this.set( 'geocoder', new google.maps.Geocoder() );
 
+        this.set( 'placesAdapter', new PlacesAdapter() );
+
         var stores = StoreCollectionFactory(
             {
-                //url,
-                url: 'http://www.maxizoo.local'+url,
+                url,
                 parse: parseResponse
             },
             null,
             {
-                model: StoreModelFactory
+                model: StoreModelClassFactory()
             }
         );
 

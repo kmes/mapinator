@@ -1,94 +1,57 @@
-import { View } from 'backbone';
+//import Backbone from 'backbone';
 
+import PlacesBloodhoundEngine from '../vendor/PlacesBloodhoundEngine';
+//import PlacesAdapter from '../vendor/PlacesAdapter';
+import typeaheadFactory from '../vendor/typeaheadFactory';
 import backboneFactory from '../vendor/backboneFactory';
+
 
 const addressView = {
     events: {
-        'click': 'pickerHandler',
-        'keyup': 'pickerHandler'
+        'keyup': 'pickerHandler',
+        'click': 'pickerHandler'
     },
     initialize: function( options ) {
         var view = this;
 
-        var addressPicker = new options.AddressPicker({
-            map: {
-                id: options.mapSelector,
-                displayMarker: false,
-                zoom: options.mapOptions.zoom,
-                center: options.mapLocation ? new google.maps.LatLng( options.mapLocation.lat, options.mapLocation.lng ) : null
-            },
-            marker: {
-                draggable: false,
-                visible: false
-            },
-            zoomForLocation: 18,
-            draggable: true,
-            reverseGeocoding: true,
-            autocompleteService: {
-                //types: ['(cities)'],
-                componentRestrictions: {country: 'IT'}
+        var serviceAdapter = options.serviceContainer.get('placesAdapter');
+        var placeEngine = new PlacesBloodhoundEngine({ serviceAdapter });
+
+        typeaheadFactory( view.el, {
+            source: placeEngine
+        });
+
+        view.el.value = options.address;
+
+        view.$el.bind('typeahead:select', function( evt, result ) {
+            if( result.lat && result.lng ) {
+                view.$el.trigger('address:select', result);
+                return;
             }
-        });
 
-        console.log('addressPicker', addressPicker, addressPicker.ttAdapter());
+            serviceAdapter.fetchLatLng({ placeId: result['place_id'] }, function( placeDetails ) {
+                if( !placeDetails ) throw new Error('Error to fetch place position');
 
-        var placeService = new google.maps.places.AutocompleteService();
+                result.lat = placeDetails.geometry.location.lat();
+                result.lng = placeDetails.geometry.location.lng();
 
-        $( view.$el ).typeahead( null, {
-             displayKey: 'description',
-             //source: addressPicker.ttAdapter()
-            source: function( query, syncSuggestions, asyncSuggestions ) {
-                console.log('source', arguments);
-
-                placeService.getQueryPredictions({ input: query }, function(predictions, status) {
-                    console.log('predictions', predictions);
-
-                    asyncSuggestions( predictions );
-                });
-            }
-        });
-
-        if( options.addressText ) {
-            this.$el.val( options.addressText );
-        }
-
-        //var placeService = addressPicker.placeService;
-
-        console.log('placeService', placeService);
-
-        //addressPicker.bindDefaultTypeaheadEvent( view.$el );
-        /*view.$el.bind('typeahead:selected', addressPicker.updateMap);*/
-        view.$el.bind('typeahead:selected', function(evt, place) {
-            placeService.getDetails(place, function( result ) {
-                var location = {
-                    lat: result.geometry.location.lat(),
-                    lng: result.geometry.location.lng()
-                };
-                options.serviceContainer.setLocation( location, true );
-
-                view.$el.blur();
-
-                /*view.collection.fetch({
-                 data: location
-                 });*/
+                view.$el.trigger( 'address:select', result );
             });
+
         });
-        //view.$el.bind('typeahead:cursorchanged', addressPicker.updateMap);
 
-        options.serviceContainer.set('addressPicker', addressPicker );
-        options.serviceContainer.set('map', addressPicker.map );
-        options.serviceContainer.set('placeService', placeService );
-
-        if( options.cancelAddressSelector ) {
-            $( options.cancelAddressSelector ).on('click', function( evt ) {
-                view.$el.val('');
-            });
-        }
     },
     pickerHandler: function( evt, result ) {
         var view = this;
+        var input = view.el;
+        var $input = jQuery( input );
 
-        //console.log('event', evt.keyCode);
+        var selectFirst = function() {
+            setTimeout(function() {
+                if( !jQuery('.tt-dataset-0').length || !jQuery('.tt-dataset-0').find('.tt-suggestion').length ) return;
+                jQuery('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
+            }, 200);
+        };
 
         switch( evt.type ) {
             case 'keyup' :
@@ -96,15 +59,14 @@ const addressView = {
                 if( keyCode == 40 || keyCode == 38 ) {
                     break;
                 }
-                setTimeout(function() {
-                    $('.tt-dataset-0').find('.tt-suggestion').eq(0).addClass('tt-cursor');
-                }, 200);
+                selectFirst();
                 break;
             case 'click' :
-                view.el.setSelectionRange(0, view.el.value.length);
+                input.setSelectionRange(0, input.value.length);
+                selectFirst();
                 break;
         }
     }
 };
 
-export default backboneFactory( addressView, View );
+export default backboneFactory( addressView, Backbone.View );
