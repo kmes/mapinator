@@ -2836,19 +2836,10 @@ var AbstractServiceContainer = function (_Backbone$Model) {
         value: function getAddressFromLatLng(lat, lng, callback) {
             if (!callback) callback = function callback() {};
 
-            var latLng = {
-                lat: lat,
-                lng: lng
-            };
+            this.get('placesAdapter').fetchPlaceByLatLng({ location: { lat: lat, lng: lng } }, function (result) {
+                var address = result['formatted_address'] || null;
 
-            this.get('geocoder').geocode({
-                location: latLng
-            }, function (results, status) {
-                if (status === google.maps.GeocoderStatus.OK && results[1]) {
-                    callback(results[1]);
-                } else {
-                    callback(false);
-                }
+                callback(address, result);
             });
         }
     }]);
@@ -3622,8 +3613,8 @@ var PlacesAdapter = function () {
             });
         }
     }, {
-        key: 'fetchLatLng',
-        value: function fetchLatLng(options) {
+        key: 'fetchPlaceByLatLng',
+        value: function fetchPlaceByLatLng(options) {
             var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 
             this.geocoder.geocode(options, function (results, status) {

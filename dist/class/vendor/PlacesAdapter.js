@@ -34,8 +34,8 @@ var PlacesAdapter = function () {
             });
         }
     }, {
-        key: 'fetchLatLng',
-        value: function fetchLatLng(options) {
+        key: 'fetchPlaceByLatLng',
+        value: function fetchPlaceByLatLng(options) {
             var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
 
             this.geocoder.geocode(options, function (results, status) {

@@ -117,19 +117,10 @@ var AbstractServiceContainer = function (_Backbone$Model) {
         value: function getAddressFromLatLng(lat, lng, callback) {
             if (!callback) callback = function callback() {};
 
-            var latLng = {
-                lat: lat,
-                lng: lng
-            };
+            this.get('placesAdapter').fetchPlaceByLatLng({ location: { lat: lat, lng: lng } }, function (result) {
+                var address = result['formatted_address'] || null;
 
-            this.get('geocoder').geocode({
-                location: latLng
-            }, function (results, status) {
-                if (status === google.maps.GeocoderStatus.OK && results[1]) {
-                    callback(results[1]);
-                } else {
-                    callback(false);
-                }
+                callback(address, result);
             });
         }
     }]);
