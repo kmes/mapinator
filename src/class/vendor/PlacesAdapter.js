@@ -21,7 +21,7 @@ export default class PlacesAdapter {
         );
     }
 
-    fetchLatLng( options, callback = () => {}) {
+    fetchPlaceByLatLng( options, callback = () => {}) {
         this.geocoder.geocode( options, function( results, status ) {
             if( status !== 'OK' || !results.length ) {
                 callback( false );

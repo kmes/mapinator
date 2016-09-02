@@ -82,7 +82,7 @@ export default class AbstractServiceContainer extends Backbone.Model {
     getAddressFromLatLng( lat, lng, callback ) {
         if( !callback ) callback = function() {};
 
-        this.get('placesAdapter').fetchLatLng({ location: {lat, lng} }, ( result ) => {
+        this.get('placesAdapter').fetchPlaceByLatLng({ location: {lat, lng} }, ( result ) => {
             var address = result['formatted_address'] || null;
 
             callback( address, result );
