@@ -146,7 +146,7 @@ var Mapinator = function () {
             for (var n in minStores) {
                 var store = minStores[n];
 
-                console.log('store', n, store.get('lat'), store.get('lng'));
+                //console.log('store', n, store.get('lat'), store.get('lng'));
 
                 if (!bounds.contains(new google.maps.LatLng(store.get('lat'), store.get('lng')))) {
                     bounds.extend(new google.maps.LatLng(store.get('lat'), store.get('lng')));

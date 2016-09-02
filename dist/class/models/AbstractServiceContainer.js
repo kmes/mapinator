@@ -75,7 +75,7 @@ var AbstractServiceContainer = function (_Backbone$Model) {
 
             this.set('stores', stores);
 
-            console.log('stores', this.get('stores'));
+            //console.log( 'stores', this.get('stores') );
 
             if (typeof this.setLocation !== 'function') {
                 this.setLocation = function () {
@@ -104,7 +104,7 @@ var AbstractServiceContainer = function (_Backbone$Model) {
             mapBounds.extend(new google.maps.LatLng(mapLocation.lat, mapLocation.lng));
             for (var n in minStores) {
                 var store = minStores[n];
-                console.log('store', n, store.get('lat'), store.get('lng'));
+                //console.log('store', n, store.get('lat'), store.get('lng'));
                 if (!mapBounds.contains(new google.maps.LatLng(store.get('lat'), store.get('lng')))) {
                     mapBounds.extend(new google.maps.LatLng(store.get('lat'), store.get('lng')));
                 }
