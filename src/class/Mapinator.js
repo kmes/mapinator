@@ -80,7 +80,6 @@ export default class Mapinator {
         endLoading();
     }
 
-
     fitMapToMarkers() {
         this.serviceContainer.get('easyMap').fitCenterZoomToMarkers();
     }

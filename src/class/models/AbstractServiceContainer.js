@@ -82,24 +82,10 @@ export default class AbstractServiceContainer extends Backbone.Model {
     getAddressFromLatLng( lat, lng, callback ) {
         if( !callback ) callback = function() {};
 
-        var latLng = {
-            lat: lat,
-            lng: lng
-        };
-
-        this.get('geocoder').geocode(
-            {
-                location: latLng
-            },
-            function( results, status ) {
-                if( status === google.maps.GeocoderStatus.OK && results[1] ) {
-                    callback( results[1] );
-                }
-                else {
-                    callback( false );
-                }
-            }
-        );
+        this.get('placesAdapter').fetchLatLng({ location: {lat, lng} }, ( result ) => {
+            //callback( result );
+            console.log('address', result);
+        });
     }
 
 
