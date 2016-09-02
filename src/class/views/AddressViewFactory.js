@@ -29,7 +29,7 @@ const addressView = {
                 return;
             }
 
-            serviceAdapter.fetchLatLng({ placeId: result['place_id'] }, function( placeDetails ) {
+            serviceAdapter.fetchPlaceByLatLng({ placeId: result['place_id'] }, function( placeDetails ) {
                 if( !placeDetails ) throw new Error('Error to fetch place position');
 
                 result.lat = placeDetails.geometry.location.lat();
