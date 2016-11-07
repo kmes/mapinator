@@ -17,7 +17,7 @@ function backboneFactory(customObj, BackboneClass) {
             args[_key - 1] = arguments[_key];
         }
 
-        var classProps = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        var classProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         return new (Function.prototype.bind.apply(BackboneClass.extend(Object.assign({}, customObj, classProps)), [null].concat(args)))();
     };
 

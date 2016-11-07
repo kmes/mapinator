@@ -20,7 +20,7 @@ var PlacesBloodhoundEngine = function (_Bloodhound) {
     _inherits(PlacesBloodhoundEngine, _Bloodhound);
 
     function PlacesBloodhoundEngine() {
-        var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
         _classCallCheck(this, PlacesBloodhoundEngine);
 
@@ -45,7 +45,7 @@ var PlacesBloodhoundEngine = function (_Bloodhound) {
     _createClass(PlacesBloodhoundEngine, [{
         key: "onSearch",
         value: function onSearch(query) {
-            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+            var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
             var self = this;
 

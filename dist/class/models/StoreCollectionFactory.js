@@ -18,8 +18,8 @@ var storeCollection = {
     },*/
 
     fetchStores: function fetchStores() {
-        var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-        var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
         return this.fetch(_extends({}, options, {
 

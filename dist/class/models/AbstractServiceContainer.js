@@ -24,10 +24,11 @@ var AbstractServiceContainer = function (_Backbone$Model) {
     _inherits(AbstractServiceContainer, _Backbone$Model);
 
     function AbstractServiceContainer(_ref, _ref2) {
-        var StoreCollectionFactory = _ref.StoreCollectionFactory;
-        var StoreModelClassFactory = _ref.StoreModelClassFactory;
-        var url = _ref2.url;
-        var parseResponse = _ref2.parseResponse;
+        var StoreCollectionFactory = _ref.StoreCollectionFactory,
+            StoreModelClassFactory = _ref.StoreModelClassFactory,
+            placesOptions = _ref.placesOptions;
+        var url = _ref2.url,
+            parseResponse = _ref2.parseResponse;
 
         _classCallCheck(this, AbstractServiceContainer);
 
@@ -50,21 +51,22 @@ var AbstractServiceContainer = function (_Backbone$Model) {
                 mapLoaded: false
             }
         };
-        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelClassFactory: StoreModelClassFactory }, { url: url, parseResponse: parseResponse }));
+        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelClassFactory: StoreModelClassFactory, placesOptions: placesOptions }, { url: url, parseResponse: parseResponse }));
     }
 
     _createClass(AbstractServiceContainer, [{
         key: 'initialize',
         value: function initialize(classProps, _ref3, _ref4) {
-            var StoreCollectionFactory = _ref3.StoreCollectionFactory;
-            var StoreModelClassFactory = _ref3.StoreModelClassFactory;
-            var url = _ref4.url;
-            var parseResponse = _ref4.parseResponse;
+            var StoreCollectionFactory = _ref3.StoreCollectionFactory,
+                StoreModelClassFactory = _ref3.StoreModelClassFactory,
+                placesOptions = _ref3.placesOptions;
+            var url = _ref4.url,
+                parseResponse = _ref4.parseResponse;
 
             this.set('mapBounds', new google.maps.LatLngBounds());
             this.set('geocoder', new google.maps.Geocoder());
 
-            this.set('placesAdapter', new _PlacesAdapter2.default());
+            this.set('placesAdapter', new _PlacesAdapter2.default(placesOptions));
 
             var stores = StoreCollectionFactory({
                 url: url,

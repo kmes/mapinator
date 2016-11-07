@@ -90,7 +90,7 @@ var Mapinator = function () {
         value: function refreshStores(options) {
             var _this2 = this;
 
-            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+            var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
             this.showLoading();
 
@@ -111,8 +111,8 @@ var Mapinator = function () {
     }, {
         key: 'showLoading',
         value: function showLoading() {
-            var _config$startLoading = this.config.startLoading;
-            var startLoading = _config$startLoading === undefined ? function () {} : _config$startLoading;
+            var _config$startLoading = this.config.startLoading,
+                startLoading = _config$startLoading === undefined ? function () {} : _config$startLoading;
 
 
             startLoading();
@@ -120,8 +120,8 @@ var Mapinator = function () {
     }, {
         key: 'hideLoading',
         value: function hideLoading() {
-            var _config$endLoading = this.config.endLoading;
-            var endLoading = _config$endLoading === undefined ? function () {} : _config$endLoading;
+            var _config$endLoading = this.config.endLoading,
+                endLoading = _config$endLoading === undefined ? function () {} : _config$endLoading;
 
 
             endLoading();
@@ -160,14 +160,15 @@ var Mapinator = function () {
     }, {
         key: 'createServiceContainer',
         value: function createServiceContainer(_ref) {
-            var storesUrl = _ref.storesUrl;
-            var storesComparator = _ref.storesComparator;
-            var _ref$parseRequest = _ref.parseRequest;
-            var parseRequest = _ref$parseRequest === undefined ? function (req) {
+            var storesUrl = _ref.storesUrl,
+                placesOptions = _ref.placesOptions,
+                storesComparator = _ref.storesComparator,
+                _ref$parseRequest = _ref.parseRequest,
+                parseRequest = _ref$parseRequest === undefined ? function (req) {
                 return req;
-            } : _ref$parseRequest;
-            var _ref$parseResponse = _ref.parseResponse;
-            var parseResponse = _ref$parseResponse === undefined ? function (resp) {
+            } : _ref$parseRequest,
+                _ref$parseResponse = _ref.parseResponse,
+                parseResponse = _ref$parseResponse === undefined ? function (resp) {
                 return resp;
             } : _ref$parseResponse;
 
@@ -212,7 +213,8 @@ var Mapinator = function () {
 
             return new ServiceContainer({
                 StoreCollectionFactory: _StoreCollectionFactory2.default,
-                StoreModelClassFactory: _StoreModelClassFactory2.default
+                StoreModelClassFactory: _StoreModelClassFactory2.default,
+                placesOptions: placesOptions
             }, {
                 url: storesUrl,
                 parseResponse: parseResponse

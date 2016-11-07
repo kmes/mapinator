@@ -6012,7 +6012,7 @@ var Mapinator = function () {
         value: function refreshStores(options) {
             var _this2 = this;
 
-            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+            var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
             this.showLoading();
 
@@ -6033,8 +6033,8 @@ var Mapinator = function () {
     }, {
         key: 'showLoading',
         value: function showLoading() {
-            var _config$startLoading = this.config.startLoading;
-            var startLoading = _config$startLoading === undefined ? function () {} : _config$startLoading;
+            var _config$startLoading = this.config.startLoading,
+                startLoading = _config$startLoading === undefined ? function () {} : _config$startLoading;
 
 
             startLoading();
@@ -6042,8 +6042,8 @@ var Mapinator = function () {
     }, {
         key: 'hideLoading',
         value: function hideLoading() {
-            var _config$endLoading = this.config.endLoading;
-            var endLoading = _config$endLoading === undefined ? function () {} : _config$endLoading;
+            var _config$endLoading = this.config.endLoading,
+                endLoading = _config$endLoading === undefined ? function () {} : _config$endLoading;
 
 
             endLoading();
@@ -6082,14 +6082,15 @@ var Mapinator = function () {
     }, {
         key: 'createServiceContainer',
         value: function createServiceContainer(_ref) {
-            var storesUrl = _ref.storesUrl;
-            var storesComparator = _ref.storesComparator;
-            var _ref$parseRequest = _ref.parseRequest;
-            var parseRequest = _ref$parseRequest === undefined ? function (req) {
+            var storesUrl = _ref.storesUrl,
+                placesOptions = _ref.placesOptions,
+                storesComparator = _ref.storesComparator,
+                _ref$parseRequest = _ref.parseRequest,
+                parseRequest = _ref$parseRequest === undefined ? function (req) {
                 return req;
-            } : _ref$parseRequest;
-            var _ref$parseResponse = _ref.parseResponse;
-            var parseResponse = _ref$parseResponse === undefined ? function (resp) {
+            } : _ref$parseRequest,
+                _ref$parseResponse = _ref.parseResponse,
+                parseResponse = _ref$parseResponse === undefined ? function (resp) {
                 return resp;
             } : _ref$parseResponse;
 
@@ -6134,7 +6135,8 @@ var Mapinator = function () {
 
             return new ServiceContainer({
                 StoreCollectionFactory: _StoreCollectionFactory2.default,
-                StoreModelClassFactory: _StoreModelClassFactory2.default
+                StoreModelClassFactory: _StoreModelClassFactory2.default,
+                placesOptions: placesOptions
             }, {
                 url: storesUrl,
                 parseResponse: parseResponse
@@ -6213,10 +6215,11 @@ var AbstractServiceContainer = function (_Backbone$Model) {
     _inherits(AbstractServiceContainer, _Backbone$Model);
 
     function AbstractServiceContainer(_ref, _ref2) {
-        var StoreCollectionFactory = _ref.StoreCollectionFactory;
-        var StoreModelClassFactory = _ref.StoreModelClassFactory;
-        var url = _ref2.url;
-        var parseResponse = _ref2.parseResponse;
+        var StoreCollectionFactory = _ref.StoreCollectionFactory,
+            StoreModelClassFactory = _ref.StoreModelClassFactory,
+            placesOptions = _ref.placesOptions;
+        var url = _ref2.url,
+            parseResponse = _ref2.parseResponse;
 
         _classCallCheck(this, AbstractServiceContainer);
 
@@ -6239,21 +6242,22 @@ var AbstractServiceContainer = function (_Backbone$Model) {
                 mapLoaded: false
             }
         };
-        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelClassFactory: StoreModelClassFactory }, { url: url, parseResponse: parseResponse }));
+        return _possibleConstructorReturn(this, (AbstractServiceContainer.__proto__ || Object.getPrototypeOf(AbstractServiceContainer)).call(this, classProps, { StoreCollectionFactory: StoreCollectionFactory, StoreModelClassFactory: StoreModelClassFactory, placesOptions: placesOptions }, { url: url, parseResponse: parseResponse }));
     }
 
     _createClass(AbstractServiceContainer, [{
         key: 'initialize',
         value: function initialize(classProps, _ref3, _ref4) {
-            var StoreCollectionFactory = _ref3.StoreCollectionFactory;
-            var StoreModelClassFactory = _ref3.StoreModelClassFactory;
-            var url = _ref4.url;
-            var parseResponse = _ref4.parseResponse;
+            var StoreCollectionFactory = _ref3.StoreCollectionFactory,
+                StoreModelClassFactory = _ref3.StoreModelClassFactory,
+                placesOptions = _ref3.placesOptions;
+            var url = _ref4.url,
+                parseResponse = _ref4.parseResponse;
 
             this.set('mapBounds', new google.maps.LatLngBounds());
             this.set('geocoder', new google.maps.Geocoder());
 
-            this.set('placesAdapter', new _PlacesAdapter2.default());
+            this.set('placesAdapter', new _PlacesAdapter2.default(placesOptions));
 
             var stores = StoreCollectionFactory({
                 url: url,
@@ -6343,8 +6347,8 @@ var storeCollection = {
     },*/
 
     fetchStores: function fetchStores() {
-        var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-        var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
         return this.fetch(_extends({}, options, {
 
@@ -6388,7 +6392,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function EasyMaps(properties) {
     var that = this;
@@ -7053,30 +7057,58 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var PlacesAdapter = function () {
     function PlacesAdapter() {
+        var autocompletionRequest = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
         _classCallCheck(this, PlacesAdapter);
 
         this.placeService = new google.maps.places.AutocompleteService();
         this.geocoder = new google.maps.Geocoder();
+
+        this.defaultAutocompletionRequest = {
+            input: 'italy',
+            types: ['geocode'],
+            componentRestrictions: {
+                country: 'it'
+            }
+        };
+
+        this.setAutocompletionRequest(autocompletionRequest);
     }
 
     _createClass(PlacesAdapter, [{
+        key: 'setAutocompletionRequest',
+        value: function setAutocompletionRequest() {
+            var autocompletionRequest = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+            var defaultAutocompletionRequest = this.defaultAutocompletionRequest;
+
+            return this.autocompletionRequest = _extends({}, defaultAutocompletionRequest, autocompletionRequest);
+        }
+    }, {
+        key: 'getAutocompletionRequest',
+        value: function getAutocompletionRequest() {
+            var query = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+            if (query) {
+                this.autocompletionRequest.query = query;
+            }
+
+            return this.autocompletionRequest;
+        }
+    }, {
         key: 'search',
         value: function search(query) {
-            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+            var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
-            this.placeService.getPlacePredictions({
-                input: query,
-                types: ['geocode'],
-                componentRestrictions: {
-                    country: 'it'
-                }
-            }, function (suggestions, status) {
+            this.placeService.getPlacePredictions(this.getAutocompletionRequest(query), function (suggestions, status) {
                 //console.log('suggestions', suggestions);
 
                 callback(suggestions, status);
@@ -7085,7 +7117,7 @@ var PlacesAdapter = function () {
     }, {
         key: 'fetchPlaceByLatLng',
         value: function fetchPlaceByLatLng(options) {
-            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+            var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
             this.geocoder.geocode(options, function (results, status) {
                 if (status !== 'OK' || !results.length) {
@@ -7126,7 +7158,7 @@ var PlacesBloodhoundEngine = function (_Bloodhound) {
     _inherits(PlacesBloodhoundEngine, _Bloodhound);
 
     function PlacesBloodhoundEngine() {
-        var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
         _classCallCheck(this, PlacesBloodhoundEngine);
 
@@ -7151,7 +7183,7 @@ var PlacesBloodhoundEngine = function (_Bloodhound) {
     _createClass(PlacesBloodhoundEngine, [{
         key: "onSearch",
         value: function onSearch(query) {
-            var callback = arguments.length <= 1 || arguments[1] === undefined ? function () {} : arguments[1];
+            var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {};
 
             var self = this;
 
@@ -7187,7 +7219,7 @@ Object.defineProperty(exports, "__esModule", {
 function backboneClassFactory(customObj, BackboneClass) {
 
     return function () {
-        var classProps = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        var classProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         return BackboneClass.extend(Object.assign({}, customObj, classProps));
     };
 }
@@ -7214,7 +7246,7 @@ function backboneFactory(customObj, BackboneClass) {
             args[_key - 1] = arguments[_key];
         }
 
-        var classProps = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        var classProps = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         return new (Function.prototype.bind.apply(BackboneClass.extend(Object.assign({}, customObj, classProps)), [null].concat(args)))();
     };
 
@@ -7235,7 +7267,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 exports.default = typeaheadFactory;
 function typeaheadFactory(selector) {
-    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     //require('typeahead.js');
 
@@ -7346,13 +7378,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var mapView = {
     initialize: function initialize(_ref) {
-        var serviceContainer = _ref.serviceContainer;
-        var EasyMaps = _ref.EasyMaps;
-        var mapLocation = _ref.mapLocation;
-        var mapZoom = _ref.mapZoom;
-        var mapControls = _ref.mapControls;
-        var markerIcon = _ref.markerIcon;
-        var infoWindow = _ref.infoWindow;
+        var serviceContainer = _ref.serviceContainer,
+            EasyMaps = _ref.EasyMaps,
+            mapLocation = _ref.mapLocation,
+            mapZoom = _ref.mapZoom,
+            mapControls = _ref.mapControls,
+            markerIcon = _ref.markerIcon,
+            infoWindow = _ref.infoWindow;
 
         var view = this;
 
@@ -7391,20 +7423,20 @@ var mapView = {
     },
 
     refreshMap: function refreshMap(_ref2) {
-        var collection = _ref2.collection;
-        var easyMap = _ref2.easyMap;
-        var iconPath = _ref2.iconPath;
-        var infoWindowCreator = _ref2.infoWindowCreator;
+        var collection = _ref2.collection,
+            easyMap = _ref2.easyMap,
+            iconPath = _ref2.iconPath,
+            infoWindowCreator = _ref2.infoWindowCreator;
 
         this.removeAllMarkers(easyMap);
         this.loadMarkers({ collection: collection, easyMap: easyMap, iconPath: iconPath, infoWindowCreator: infoWindowCreator });
     },
 
     loadMarkers: function loadMarkers(_ref3) {
-        var collection = _ref3.collection;
-        var easyMap = _ref3.easyMap;
-        var iconPath = _ref3.iconPath;
-        var infoWindowCreator = _ref3.infoWindowCreator;
+        var collection = _ref3.collection,
+            easyMap = _ref3.easyMap,
+            iconPath = _ref3.iconPath,
+            infoWindowCreator = _ref3.infoWindowCreator;
 
         for (var n in collection.models) {
             var model = collection.models[n];
