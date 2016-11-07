@@ -108,7 +108,7 @@ export default class Mapinator {
         serviceContainer.get('map').fitBounds( bounds );
     }
 
-    createServiceContainer({ storesUrl, storesComparator, parseRequest = (req) => req, parseResponse = (resp) => resp }) {
+    createServiceContainer({ storesUrl, placesOptions, storesComparator, parseRequest = (req) => req, parseResponse = (resp) => resp }) {
         var ServiceContainer = AbstractServiceContainer.extend({
             comparator: storesComparator,
             getLocation: function() {
@@ -153,7 +153,8 @@ export default class Mapinator {
         return new ServiceContainer(
             {
                 StoreCollectionFactory,
-                StoreModelClassFactory
+                StoreModelClassFactory,
+                placesOptions
             },
             {
                 url: storesUrl,

@@ -1,18 +1,38 @@
 export default class PlacesAdapter {
-    constructor() {
+    constructor( autocompletionRequest = {} ) {
         this.placeService = new google.maps.places.AutocompleteService();
         this.geocoder = new google.maps.Geocoder();
+
+        this.defaultAutocompletionRequest = {
+            input: 'italy',
+            types: ['geocode'],
+            componentRestrictions: {
+                country: 'it'
+            }
+        };
+
+        this.setAutocompletionRequest( autocompletionRequest );
+    }
+
+    setAutocompletionRequest( autocompletionRequest = {} ) {
+        var defaultAutocompletionRequest = this.defaultAutocompletionRequest;
+
+        return this.autocompletionRequest = {
+            ...defaultAutocompletionRequest,
+            ...autocompletionRequest
+        };
+    }
+    getAutocompletionRequest( query = null ) {
+        if( query ) {
+            this.autocompletionRequest.query = query;
+        }
+
+        return this.autocompletionRequest;
     }
 
     search( query, callback = () => {} ) {
         this.placeService.getPlacePredictions(
-            {
-                input: query,
-                types: ['geocode'],
-                componentRestrictions: {
-                    country: 'it'
-                }
-            },
+            this.getAutocompletionRequest( query ),
             function( suggestions, status ) {
                 //console.log('suggestions', suggestions);
 
