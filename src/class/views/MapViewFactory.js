@@ -55,7 +55,7 @@ const mapView = {
                     lng: model.get('lng')
                 },
                 icon: {
-                    path: iconPath,
+                    path: typeof iconPath === 'function' ? iconPath( model ) : iconPath,
                     w: 41,
                     h: 47
                 }

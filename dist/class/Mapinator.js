@@ -142,7 +142,17 @@ var Mapinator = function () {
             var bounds = new google.maps.LatLngBounds();
             bounds.extend(new google.maps.LatLng(mapLocation.lat, mapLocation.lng));
 
-            var minStores = serviceContainer.get('stores').models.slice(0, min);
+            var stores = serviceContainer.get('stores').models;
+
+            var centerLatLng = new google.maps.LatLng(center.lat, center.lng);
+            stores.sort(function (a, b) {
+                var aDist = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(a.get('lat'), a.get('lng')), centerLatLng);
+                var bDist = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(b.get('lat'), b.get('lng')), centerLatLng);
+
+                return aDist - bDist;
+            });
+
+            var minStores = stores.slice(0, min);
             for (var n in minStores) {
                 var store = minStores[n];
 
@@ -157,6 +167,25 @@ var Mapinator = function () {
 
             serviceContainer.get('map').fitBounds(bounds);
         }
+
+        /*fitMapToNearestMarkers( min, center ) {
+            if( !min ) min = 1;
+             var serviceContainer = this.serviceContainer;
+            var mapLocation = center || serviceContainer.get('mapLocation');
+             var bounds = new google.maps.LatLngBounds();
+            bounds.extend( new google.maps.LatLng(mapLocation.lat, mapLocation.lng) );
+             var minStores = serviceContainer.get('stores').models.slice(0, min);
+            for( var n in minStores ) {
+                var store = minStores[n];
+                 //console.log('store', n, store.get('lat'), store.get('lng'));
+                 if( !bounds.contains(new google.maps.LatLng( store.get('lat'), store.get('lng') )) ) {
+                    bounds.extend(new google.maps.LatLng( store.get('lat'), store.get('lng') ));
+                }
+            }
+             serviceContainer.get('easyMap').setZoom( 30 );
+             serviceContainer.get('map').fitBounds( bounds );
+        }*/
+
     }, {
         key: 'createServiceContainer',
         value: function createServiceContainer(_ref) {
@@ -254,7 +283,7 @@ var Mapinator = function () {
                     'disableDoubleClickZoom': false,
                     'draggable': true
                 },
-                markerIcon: typeof config.iconPath === 'function' ? config.iconPath() : config.iconPath,
+                markerIcon: config.iconPath,
                 infoWindow: config.infoWindow,
                 collection: serviceContainer.get('stores')
             });
