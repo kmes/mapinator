@@ -70,9 +70,6 @@ const mapView = {
             }
             easyMap.addMarker( markerConfig );
         }
-
-        //todo: togliere?
-        //easyMap.fitCenterZoomToMarkers();
     },
 
     removeAllMarkers: function( easyMap ) {
