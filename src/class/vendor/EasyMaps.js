@@ -27,7 +27,8 @@ function EasyMaps( properties ) {
     that.bounds = null;
 
     that.eventListener = {
-        onLoaded: function() {}
+        onLoaded: function() {},
+        onMarkerClick: function() {}
     };
 
     for( var evt in that.eventListener ) {
@@ -120,6 +121,13 @@ EasyMaps.prototype.addEventListener = function( event, fnHandler ) {
         return false;
     }
 
+};
+EasyMaps.prototype.triggerEvent = function( eventName, data ) {
+    var that = this;
+
+    if( typeof that.eventListener[ eventName ] === 'function' ) {
+        that.eventListener[ eventName ]( data );
+    }
 };
 
 EasyMaps.prototype.onLoaded = function( fnHandler ) {
@@ -349,6 +357,14 @@ EasyMaps.prototype.addMarker = function( markerData, render, clusterData, callba
             markerConf['title'] = markerList[ n ]['title'];
         }
         var marker = new google.maps.Marker( markerConf );
+
+        (function( markerData, marker ) {
+            google.maps.event.addListener( marker, 'click', function() {
+                that.triggerEvent('onMarkerClick', markerData, marker);
+            });
+
+        })( markerData, marker );
+
 
         that.markerObjList.push( marker );
 

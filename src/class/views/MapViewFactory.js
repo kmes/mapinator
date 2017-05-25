@@ -58,7 +58,8 @@ const mapView = {
                     path: typeof iconPath === 'function' ? iconPath( model ) : iconPath,
                     w: 41,
                     h: 47
-                }
+                },
+                model: model
             };
             if( typeof infoWindowCreator === 'function' ) {
                 var content = infoWindowCreator( model.attributes, model );
