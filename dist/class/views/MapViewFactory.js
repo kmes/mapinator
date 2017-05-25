@@ -84,7 +84,8 @@ var mapView = {
                     path: typeof iconPath === 'function' ? iconPath(model) : iconPath,
                     w: 41,
                     h: 47
-                }
+                },
+                model: model
             };
             if (typeof infoWindowCreator === 'function') {
                 var content = infoWindowCreator(model.attributes, model);
@@ -96,9 +97,6 @@ var mapView = {
             }
             easyMap.addMarker(markerConfig);
         }
-
-        //todo: togliere?
-        //easyMap.fitCenterZoomToMarkers();
     },
 
     removeAllMarkers: function removeAllMarkers(easyMap) {

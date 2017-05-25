@@ -530,7 +530,8 @@ function EasyMaps(properties) {
     that.bounds = null;
 
     that.eventListener = {
-        onLoaded: function onLoaded() {}
+        onLoaded: function onLoaded() {},
+        onMarkerClick: function onMarkerClick() {}
     };
 
     for (var evt in that.eventListener) {
@@ -618,6 +619,13 @@ EasyMaps.prototype.addEventListener = function (event, fnHandler) {
         return true;
     } else {
         return false;
+    }
+};
+EasyMaps.prototype.triggerEvent = function (eventName, data) {
+    var that = this;
+
+    if (typeof that.eventListener[eventName] === 'function') {
+        that.eventListener[eventName](data);
     }
 };
 
@@ -833,6 +841,12 @@ EasyMaps.prototype.addMarker = function (markerData, render, clusterData, callba
             markerConf['title'] = markerList[n]['title'];
         }
         var marker = new google.maps.Marker(markerConf);
+
+        (function (markerData, marker) {
+            google.maps.event.addListener(marker, 'click', function () {
+                that.triggerEvent('onMarkerClick', markerData, marker);
+            });
+        })(markerData, marker);
 
         that.markerObjList.push(marker);
 
@@ -1558,7 +1572,8 @@ var mapView = {
                     path: typeof iconPath === 'function' ? iconPath(model) : iconPath,
                     w: 41,
                     h: 47
-                }
+                },
+                model: model
             };
             if (typeof infoWindowCreator === 'function') {
                 var content = infoWindowCreator(model.attributes, model);
@@ -1570,9 +1585,6 @@ var mapView = {
             }
             easyMap.addMarker(markerConfig);
         }
-
-        //todo: togliere?
-        //easyMap.fitCenterZoomToMarkers();
     },
 
     removeAllMarkers: function removeAllMarkers(easyMap) {
