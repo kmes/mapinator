@@ -1,3 +1,5 @@
+import "babel-polyfill";
+
 import Mapinator from './class/Mapinator';
 
 //import AbstractServiceContainer from './class/models/AbstractServiceContainer';
