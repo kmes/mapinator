@@ -145,7 +145,8 @@ export default class Mapinator {
     }*/
 
     createServiceContainer({ storesUrl, placesOptions, storesComparator, parseRequest = (req) => req, parseResponse = (resp) => resp }) {
-        var ServiceContainer = AbstractServiceContainer.extend({
+
+        var serviceContainerConfig =             {
             comparator: storesComparator,
             getLocation: function() {
                 return this.get('mapLocation');
@@ -184,9 +185,13 @@ export default class Mapinator {
             refreshDistances: function( centerLocation ) {
 
             }
-        });
+        };
 
-        return new ServiceContainer(
+        for( var name in serviceContainerConfig ) {
+            AbstractServiceContainer.prototype[ name ] = serviceContainerConfig[ name ];
+        }
+
+        return new AbstractServiceContainer(
             {
                 StoreCollectionFactory,
                 StoreModelClassFactory,

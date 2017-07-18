@@ -12948,7 +12948,8 @@ var Mapinator = function () {
                 return resp;
             } : _ref$parseResponse;
 
-            var ServiceContainer = _AbstractServiceContainer2.default.extend({
+
+            var serviceContainerConfig = {
                 comparator: storesComparator,
                 getLocation: function getLocation() {
                     return this.get('mapLocation');
@@ -12985,9 +12986,17 @@ var Mapinator = function () {
                     });
                 },
                 refreshDistances: function refreshDistances(centerLocation) {}
-            });
+            };
 
-            return new ServiceContainer({
+            for (var name in serviceContainerConfig) {
+                _AbstractServiceContainer2.default.prototype[name] = serviceContainerConfig[name];
+            }
+
+            /*var ServiceContainer = AbstractServiceContainer.extend(
+                serviceContainerConfig
+            );*/
+
+            return new _AbstractServiceContainer2.default({
                 StoreCollectionFactory: _StoreCollectionFactory2.default,
                 StoreModelClassFactory: _StoreModelClassFactory2.default,
                 placesOptions: placesOptions

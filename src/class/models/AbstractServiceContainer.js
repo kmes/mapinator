@@ -89,10 +89,6 @@ export default class AbstractServiceContainer extends Backbone.Model {
         });
     }
 
-    extend( obj ) {
-        return Backbone.Model.apply(this, arguments);
-    }
-
 
 }
 
